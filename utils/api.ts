@@ -1,6 +1,7 @@
 import AsyncStorage from './storage';
 import { personalityTestQuestions, personalityTestCharacters, calculatePersonalityTestResult, PersonalityTestResult } from './personalityTestData';
 
+// 백엔드 서버 주소 (CharacterAPI와 동일하게 설정)
 const BASE_URL = 'http://api.hjun.kr/hackathon';
 
 export interface User {
@@ -80,13 +81,30 @@ class ApiService {
     try {
       console.log('[API] Login request:', { id, password: '***' });
       
-      const response = await fetch(`${BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id, password }),
-      });
+      let response;
+      try {
+        console.log('[API] Attempting to fetch:', `${BASE_URL}/auth/login`);
+        response = await fetch(`${BASE_URL}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id, password }),
+        });
+        console.log('[API] Raw response:', response);
+        console.log('[API] Response status:', response.status);
+        console.log('[API] Response headers:', response.headers);
+      } catch (fetchError: any) {
+        console.log('[API] =================== FETCH ERROR ===================');
+        console.log('[API] Fetch error:', fetchError);
+        console.log('[API] Error type:', fetchError.constructor.name);
+        console.log('[API] Error message:', fetchError.message);
+        console.log('[API] Error code:', fetchError.code);
+        console.log('[API] Error stack:', fetchError.stack);
+        console.log('[API] Full error object:', JSON.stringify(fetchError, null, 2));
+        console.log('[API] ================================================');
+        throw fetchError;
+      }
 
       const data = await response.json();
       console.log('[API] Login response:', {

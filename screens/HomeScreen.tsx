@@ -11,11 +11,13 @@ import {
   Image,
   Linking,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
-import { toysData } from '../utils/toysData';
 import { FavoriteManager } from '../utils/favoriteManager';
+import CharacterAPI, { Character } from '../utils/characterApi';
+import AsyncStorage from '../utils/storage';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -199,19 +201,41 @@ const CharacterShoppingApp = () => {
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [likeCounts, setLikeCounts] = useState<{[key: string]: number}>({});
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
   useEffect(() => {
     loadFavorites();
-    initializeLikeCounts();
+    loadCharacters();
   }, []);
 
-  const initializeLikeCounts = () => {
-    const counts: {[key: string]: number} = {};
-    toysData.forEach(toy => {
-      counts[toy.id] = Math.floor(Math.random() * 20 + 5);
-    });
-    setLikeCounts(counts);
+  const loadCharacters = async () => {
+    try {
+      setLoading(true);
+      // Clear cache and force refresh from backend
+      await CharacterAPI.clearCache();
+      const data = await CharacterAPI.getCharacters(true);
+      
+      if (data && data.length > 0) {
+        setCharacters(data);
+        
+        // Initialize like counts for loaded characters
+        const counts: {[key: string]: number} = {};
+        data.forEach(char => {
+          counts[char.id] = Math.floor(Math.random() * 20 + 5);
+        });
+        setLikeCounts(counts);
+      } else {
+        console.log('[HomeScreen] No characters loaded');
+        setCharacters([]);
+      }
+    } catch (error) {
+      console.error('[HomeScreen] Error loading characters:', error);
+      setCharacters([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const loadFavorites = async () => {
@@ -229,8 +253,24 @@ const CharacterShoppingApp = () => {
     }));
   };
 
-  const handleCharacterPress = (url: string) => {
-    Linking.openURL(url);
+  const handleCharacterPress = async (character: Character) => {
+    try {
+      // Get current owned characters
+      const stored = await AsyncStorage.getItem('ownedCharacters');
+      let ownedCharacters = stored ? JSON.parse(stored) : [];
+      
+      // Add character if not already owned
+      if (!ownedCharacters.includes(character.id)) {
+        ownedCharacters.push(character.id);
+        await AsyncStorage.setItem('ownedCharacters', JSON.stringify(ownedCharacters));
+        console.log('[HomeScreen] Added character to owned:', character.nameKo);
+      }
+      
+      // Navigate to MyPage on owned tab
+      navigation.navigate('마이' as never);
+    } catch (error) {
+      console.error('[HomeScreen] Error adding owned character:', error);
+    }
   };
 
   const handleBannerPress = (bannerId: string) => {
@@ -317,9 +357,9 @@ const CharacterShoppingApp = () => {
 
   const getFilteredProducts = () => {
     if (activeTab === 'ALL') {
-      return toysData;
+      return characters;
     }
-    return toysData.filter(toy => toy.name.toUpperCase() === activeTab);
+    return characters.filter(char => char.name.toUpperCase() === activeTab);
   };
 
   const products = getFilteredProducts();
@@ -330,7 +370,7 @@ const CharacterShoppingApp = () => {
     return (
       <ProductCard 
         style={{ marginRight: index % 2 === 0 ? '2%' : 0 }}
-        onPress={() => Linking.openURL(item.popmartUrl)}
+        onPress={() => handleCharacterPress(item)}
       >
         <View style={{ position: 'relative' }}>
           <ProductImage source={{ uri: item.imageUrl }} />
@@ -452,7 +492,7 @@ const CharacterShoppingApp = () => {
               </View>
               <TrendingList horizontal showsHorizontalScrollIndicator={false}>
                 {trendingItems.map((item) => (
-                  <TrendingItem key={item.id} onPress={() => handleCharacterPress(item.url)}>
+                  <TrendingItem key={item.id} onPress={() => Linking.openURL(item.url)}>
                     <View>
                       <TrendingImage source={item.image} />
                       <TrendingNumber>{item.rank}</TrendingNumber>
@@ -476,6 +516,13 @@ const CharacterShoppingApp = () => {
                 ))}
               </TabContainer>
             </TabSection>
+            
+            {loading && (
+              <View style={{ padding: 20, alignItems: 'center' }}>
+                <ActivityIndicator size="large" color="#ef4444" />
+                <Text style={{ marginTop: 10, color: '#636e72' }}>캐릭터 로딩 중...</Text>
+              </View>
+            )}
           </>
         )}
       />

@@ -1,17 +1,11 @@
-/* global jest */
-import 'react-native-gesture-handler/jestSetup';
-import '@testing-library/jest-native/extend-expect';
+// Mock AsyncStorage
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
+);
 
-// Mock fetch for tests
-global.fetch = jest.fn();
-
-// Mock react-native modules
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-
-// Mock BackHandler
-jest.mock('react-native/Libraries/Utilities/BackHandler', () => ({
-  addEventListener: jest.fn(),
-  removeEventListener: jest.fn(),
+// Mock react-native-webview
+jest.mock('react-native-webview', () => ({
+  WebView: jest.fn(),
 }));
 
 // Mock navigation
@@ -22,9 +16,16 @@ jest.mock('@react-navigation/native', () => {
     useNavigation: () => ({
       navigate: jest.fn(),
       goBack: jest.fn(),
+      reset: jest.fn(),
     }),
-    useRoute: () => ({
-      params: {},
-    }),
+    useFocusEffect: jest.fn(),
   };
+});
+
+// Mock fetch
+global.fetch = jest.fn();
+
+// Reset mocks before each test
+beforeEach(() => {
+  fetch.mockClear();
 });

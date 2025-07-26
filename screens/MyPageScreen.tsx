@@ -3,9 +3,9 @@ import styled from 'styled-components/native';
 import { SafeAreaView, StatusBar, ScrollView, ActivityIndicator, Linking, View } from 'react-native';
 import ApiService, { User } from '../utils/api';
 import AsyncStorage from '../utils/storage';
-import { toysData } from '../utils/toysData';
 import { FavoriteManager } from '../utils/favoriteManager';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import CharacterAPI, { Character } from '../utils/characterApi';
 
 const Container = styled.View`
   flex: 1;
@@ -258,22 +258,45 @@ const ProfileScreen = () => {
   const [loading, setLoading] = useState(true);
   const [favoriteToyIds, setFavoriteToyIds] = useState<string[]>([]);
   const [ownedToyIds, setOwnedToyIds] = useState<string[]>([]);
+  const [characters, setCharacters] = useState<Character[]>([]);
   const navigation = useNavigation();
 
   useEffect(() => {
     loadUserProfile();
+    loadCharacters();
   }, []);
 
-  // Reload favorites when screen gains focus
+  // Reload favorites and owned characters when screen gains focus
   useFocusEffect(
     React.useCallback(() => {
       loadFavorites();
+      loadOwnedCharacters();
     }, [])
   );
 
   const loadFavorites = async () => {
     const favs = await FavoriteManager.getFavorites();
     setFavoriteToyIds(favs);
+  };
+
+  const loadCharacters = async () => {
+    try {
+      const data = await CharacterAPI.getCharacters();
+      setCharacters(data);
+    } catch (error) {
+      console.error('[MyPage] Error loading characters:', error);
+    }
+  };
+
+  const loadOwnedCharacters = async () => {
+    try {
+      const stored = await AsyncStorage.getItem('ownedCharacters');
+      if (stored) {
+        setOwnedToyIds(JSON.parse(stored));
+      }
+    } catch (error) {
+      console.error('[MyPage] Error loading owned characters:', error);
+    }
   };
 
   const loadUserProfile = async () => {
@@ -364,7 +387,7 @@ const ProfileScreen = () => {
                 </ItemCard>
               ) : (
                 favoriteToyIds.map(toyId => {
-                  const toy = toysData.find(t => t.id === toyId);
+                  const toy = characters.find(t => t.id === toyId);
                   if (!toy) return null;
                   return (
                     <ItemCard key={toy.id}>
@@ -393,7 +416,7 @@ const ProfileScreen = () => {
           ) : (
             <OwnedGrid>
               {ownedToyIds.map(toyId => {
-                const toy = toysData.find(t => t.id === toyId);
+                const toy = characters.find(t => t.id === toyId);
                 if (!toy) return null;
                 return (
                   <OwnedItem key={toy.id} onPress={() => Linking.openURL(toy.popmartUrl)}>
@@ -401,8 +424,13 @@ const ProfileScreen = () => {
                   </OwnedItem>
                 );
               })}
+              {ownedToyIds.length > 0 && (
+                <AddItemButton onPress={() => navigation.navigate('홈' as never)}>
+                  <AddItemText>+</AddItemText>
+                </AddItemButton>
+              )}
               {ownedToyIds.length === 0 && (
-                <AddItemButton onPress={() => navigation.navigate('HomeTab' as never)}>
+                <AddItemButton onPress={() => navigation.navigate('홈' as never)}>
                   <AddItemText>+</AddItemText>
                 </AddItemButton>
               )}

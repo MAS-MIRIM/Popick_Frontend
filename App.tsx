@@ -101,8 +101,16 @@ const App = () => {
               {(props: NativeStackScreenProps<RootStackParamList, 'SignUp'>) => (
                 <SignUpScreen
                   onSignUpSuccess={async () => {
-                    setIsFirstLogin(true);
+                    // 회원가입 완료 후 바로 성격 테스트로 이동
                     setIsAuthenticated(true);
+                    setIsFirstLogin(true);
+                    // 약간의 지연을 주어 상태 업데이트가 완료되도록 함
+                    setTimeout(() => {
+                      props.navigation.reset({
+                        index: 0,
+                        routes: [{ name: 'PersonalityTest' }],
+                      });
+                    }, 100);
                   }}
                   onLoginPress={() => props.navigation.navigate('Login')}
                 />
