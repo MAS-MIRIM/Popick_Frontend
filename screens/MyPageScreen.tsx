@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
-import { SafeAreaView, StatusBar, ScrollView, ActivityIndicator } from 'react-native';
+import { SafeAreaView, StatusBar, ScrollView, ActivityIndicator, Linking } from 'react-native';
 import ApiService, { User } from '../utils/api';
 import AsyncStorage from '../utils/storage';
+import { toysData } from '../utils/toysData';
+import { FavoriteManager } from '../utils/favoriteManager';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 const Container = styled.View`
   flex: 1;
@@ -141,7 +144,7 @@ const SectionTitle = styled.Text`
   padding-top: 24px;
 `;
 
-const ItemCard = styled.TouchableOpacity`
+const ItemCard = styled.View`
   background-color: white;
   margin: 0 16px 12px 16px;
   padding: 16px;
@@ -151,22 +154,20 @@ const ItemCard = styled.TouchableOpacity`
   shadow-opacity: 0.05;
   shadow-radius: 2px;
   elevation: 2;
-`;
-
-const ItemHeader = styled.View`
   flex-direction: row;
-  align-items: center;
-  margin-bottom: 8px;
 `;
 
-const ItemIcon = styled.View`
-  width: 48px;
-  height: 48px;
-  margin-right: 12px;
+
+const ItemIcon = styled.Image`
+  width: 148px;
+  height: 148px;
+  margin-right: 16px;
+  border-radius: 12px;
 `;
 
 const ItemContent = styled.View`
   flex: 1;
+  justify-content: center;
 `;
 
 const ItemTitle = styled.Text`
@@ -184,19 +185,48 @@ const ItemDescription = styled.Text`
 const ItemFooter = styled.View`
   flex-direction: row;
   align-items: center;
-  margin-top: 12px;
   gap: 16px;
+  margin-top: 8px;
 `;
 
 const ActionButton = styled.TouchableOpacity`
-  flex-direction: row;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
 `;
 
-const ActionIcon = styled.View`
+const ActionIcon = styled.Image`
+  width: 24px;
+  height: 24px;
+`;
+
+const LinkIcon = styled.Image`
   width: 20px;
   height: 20px;
+`;
+
+const AddButton = styled.TouchableOpacity`
+  background-color: #ff4757;
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 4px;
+  elevation: 5;
+`;
+
+const AddButtonText = styled.Text`
+  color: white;
+  font-size: 28px;
+  font-weight: 300;
 `;
 
 const ProfileScreen = () => {
@@ -204,10 +234,25 @@ const ProfileScreen = () => {
   const [user, setUser] = useState<User | null>(null);
   const [testResult, setTestResult] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [favoriteToyIds, setFavoriteToyIds] = useState<string[]>([]);
+  const [ownedToyIds] = useState<string[]>(['molly-castle', 'dimoo-world', 'bearbrick-400', 'molang-sweet']);
+  const navigation = useNavigation();
 
   useEffect(() => {
     loadUserProfile();
   }, []);
+
+  // Reload favorites when screen gains focus
+  useFocusEffect(
+    React.useCallback(() => {
+      loadFavorites();
+    }, [])
+  );
+
+  const loadFavorites = async () => {
+    const favs = await FavoriteManager.getFavorites();
+    setFavoriteToyIds(favs);
+  };
 
   const loadUserProfile = async () => {
     try {
@@ -271,13 +316,13 @@ const ProfileScreen = () => {
             active={activeTab === 'favorites'} 
             onPress={() => setActiveTab('favorites')}
           >
-            <StatText active={activeTab === 'favorites'}>찜 14</StatText>
+            <StatText active={activeTab === 'favorites'}>찜 {favoriteToyIds.length}</StatText>
           </StatButton>
           <StatButton 
             active={activeTab === 'owned'}
             onPress={() => setActiveTab('owned')}
           >
-            <StatText active={activeTab === 'owned'}>소유 캐릭터 7</StatText>
+            <StatText active={activeTab === 'owned'}>소유 캐릭터 {ownedToyIds.length}</StatText>
           </StatButton>
         </StatsContainer>
       </ProfileSection>
@@ -287,97 +332,72 @@ const ProfileScreen = () => {
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
           {activeTab === 'favorites' ? (
             <>
-              <ItemCard>
-                <ItemHeader>
-                  <ItemIcon>
-                    {/* 크라이베이비 아이콘 이미지 */}
-                  </ItemIcon>
+              {favoriteToyIds.length === 0 ? (
+                <ItemCard style={{ opacity: 0.5 }}>
                   <ItemContent>
-                    <ItemTitle>크라이베이비</ItemTitle>
-                    <ItemDescription>멜프레시오니즘 시리즈{'\n'}플러시 봄 머쉰</ItemDescription>
+                    <ItemTitle style={{ textAlign: 'center' }}>찜한 캐릭터가 없습니다</ItemTitle>
+                    <ItemDescription style={{ textAlign: 'center' }}>홈 화면에서 하트를 눌러 찜해보세요!</ItemDescription>
                   </ItemContent>
-                </ItemHeader>
-                <ItemFooter>
-                  <ActionButton>
-                    <ActionIcon>
-                      {/* 하트 아이콘 */}
-                    </ActionIcon>
-                  </ActionButton>
-                  <ActionButton>
-                    <ActionIcon>
-                      {/* 공유 아이콘 */}
-                    </ActionIcon>
-                  </ActionButton>
-                </ItemFooter>
-              </ItemCard>
-
-              <ItemCard>
-                <ItemHeader>
-                  <ItemIcon>
-                    {/* 라부부 아이콘 이미지 */}
-                  </ItemIcon>
-                  <ItemContent>
-                    <ItemTitle>라부부</ItemTitle>
-                    <ItemDescription>더 몬스터즈 하이레이트{'\n'}시리즈 사랑 커플</ItemDescription>
-                  </ItemContent>
-                </ItemHeader>
-                <ItemFooter>
-                  <ActionButton>
-                    <ActionIcon>
-                      {/* 하트 아이콘 */}
-                    </ActionIcon>
-                  </ActionButton>
-                  <ActionButton>
-                    <ActionIcon>
-                      {/* 공유 아이콘 */}
-                    </ActionIcon>
-                  </ActionButton>
-                </ItemFooter>
-              </ItemCard>
+                </ItemCard>
+              ) : (
+                favoriteToyIds.map(toyId => {
+                  const toy = toysData.find(t => t.id === toyId);
+                  if (!toy) return null;
+                  return (
+                    <ItemCard key={toy.id}>
+                      <ItemIcon source={{ uri: toy.imageUrl }} />
+                      <ItemContent>
+                        <ItemTitle>{toy.nameKo}</ItemTitle>
+                        <ItemDescription>{toy.seriesKo}</ItemDescription>
+                        <ItemDescription>{toy.description}</ItemDescription>
+                        <ItemFooter>
+                          <ActionButton onPress={async () => {
+                            await FavoriteManager.removeFavorite(toy.id);
+                            await loadFavorites();
+                          }}>
+                            <ActionIcon source={require('../assets/heart1.png')} />
+                          </ActionButton>
+                          <ActionButton onPress={() => Linking.openURL(toy.popmartUrl)}>
+                            <LinkIcon source={require('../assets/link.png')} />
+                          </ActionButton>
+                        </ItemFooter>
+                      </ItemContent>
+                    </ItemCard>
+                  );
+                })
+              )}
             </>
           ) : (
             <>
-              <ItemCard>
-                <ItemHeader>
-                  <ItemIcon>
-                    {/* 소유 캐릭터 아이콘 */}
-                  </ItemIcon>
-                  <ItemContent>
-                    <ItemTitle>몰랑이</ItemTitle>
-                    <ItemDescription>귀여운 토끼 캐릭터{'\n'}한정판 피규어</ItemDescription>
-                  </ItemContent>
-                </ItemHeader>
-                <ItemFooter>
-                  <ActionButton>
-                    <ActionIcon>
-                      {/* 공유 아이콘 */}
-                    </ActionIcon>
-                  </ActionButton>
-                </ItemFooter>
-              </ItemCard>
-
-              <ItemCard>
-                <ItemHeader>
-                  <ItemIcon>
-                    {/* 소유 캐릭터 아이콘 */}
-                  </ItemIcon>
-                  <ItemContent>
-                    <ItemTitle>베어브릭</ItemTitle>
-                    <ItemDescription>400% 사이즈{'\n'}리미티드 에디션</ItemDescription>
-                  </ItemContent>
-                </ItemHeader>
-                <ItemFooter>
-                  <ActionButton>
-                    <ActionIcon>
-                      {/* 공유 아이콘 */}
-                    </ActionIcon>
-                  </ActionButton>
-                </ItemFooter>
-              </ItemCard>
+              {ownedToyIds.map(toyId => {
+                const toy = toysData.find(t => t.id === toyId);
+                if (!toy) return null;
+                return (
+                  <ItemCard key={toy.id}>
+                    <ItemIcon source={{ uri: toy.imageUrl }} />
+                    <ItemContent>
+                      <ItemTitle>{toy.nameKo}</ItemTitle>
+                      <ItemDescription>{toy.seriesKo}</ItemDescription>
+                      <ItemDescription>{toy.description}</ItemDescription>
+                      <ItemFooter>
+                        <ActionButton onPress={() => Linking.openURL(toy.popmartUrl)}>
+                          <LinkIcon source={require('../assets/link.png')} />
+                        </ActionButton>
+                      </ItemFooter>
+                    </ItemContent>
+                  </ItemCard>
+                );
+              })}
             </>
           )}
         </ScrollView>
       </ContentSection>
+      
+      {activeTab === 'owned' && (
+        <AddButton onPress={() => navigation.navigate('HomeTab' as never)}>
+          <AddButtonText>+</AddButtonText>
+        </AddButton>
+      )}
       </Container>
     </SafeAreaView>
   );

@@ -7,9 +7,6 @@ export interface Toy {
   description: string;
   imageUrl: string;
   popmartUrl: string;
-  price?: string;
-  releaseDate?: string;
-  isLimited?: boolean;
 }
 
 export const toysData: Toy[] = [
@@ -21,10 +18,7 @@ export const toysData: Toy[] = [
     seriesKo: '멜랑콜리 리듬 시리즈',
     description: '플러시 봄 머쉰',
     imageUrl: 'https://api.hjun.kr/hackathon/static/images/crybaby.png',
-    popmartUrl: 'https://www.popmart.com/kr/products/crybaby-spring-machine',
-    price: '₩15,900',
-    releaseDate: '2024-03',
-    isLimited: false
+    popmartUrl: 'https://www.popmart.com/kr/products/crybaby-spring-machine'
   },
   {
     id: 'labubu-monsters',
@@ -34,10 +28,7 @@ export const toysData: Toy[] = [
     seriesKo: '더 몬스터즈',
     description: '하이레이트 시리즈 사랑 커플',
     imageUrl: 'https://api.hjun.kr/hackathon/static/images/labubu.png',
-    popmartUrl: 'https://www.popmart.com/kr/products/labubu-the-monsters',
-    price: '₩18,900',
-    releaseDate: '2024-02',
-    isLimited: false
+    popmartUrl: 'https://www.popmart.com/kr/products/labubu-the-monsters'
   },
   {
     id: 'molly-castle',
@@ -47,10 +38,7 @@ export const toysData: Toy[] = [
     seriesKo: '캐슬 시리즈',
     description: '고전적이고 우아한 캐슬 컬렉션',
     imageUrl: 'https://api.hjun.kr/hackathon/static/images/molly.png',
-    popmartUrl: 'https://www.popmart.com/kr/products/molly-castle-series',
-    price: '₩16,900',
-    releaseDate: '2024-01',
-    isLimited: false
+    popmartUrl: 'https://www.popmart.com/kr/products/molly-castle-series'
   },
   {
     id: 'skullpanda-dark',
@@ -60,10 +48,7 @@ export const toysData: Toy[] = [
     seriesKo: '다크 나이트 시리즈',
     description: '미스터리한 다크 판타지 컬렉션',
     imageUrl: 'https://api.hjun.kr/hackathon/static/images/skullpanda.png',
-    popmartUrl: 'https://www.popmart.com/kr/products/skullpanda-dark-night',
-    price: '₩19,900',
-    releaseDate: '2023-12',
-    isLimited: true
+    popmartUrl: 'https://www.popmart.com/kr/products/skullpanda-dark-night'
   },
   {
     id: 'dimoo-world',
@@ -73,10 +58,7 @@ export const toysData: Toy[] = [
     seriesKo: '디무 월드',
     description: '귀여운 디무의 일상 이야기',
     imageUrl: 'https://api.hjun.kr/hackathon/static/images/dimoo.png',
-    popmartUrl: 'https://www.popmart.com/kr/products/dimoo-world-series',
-    price: '₩14,900',
-    releaseDate: '2024-04',
-    isLimited: false
+    popmartUrl: 'https://www.popmart.com/kr/products/dimoo-world-series'
   },
   {
     id: 'pucky-pool',
@@ -86,10 +68,7 @@ export const toysData: Toy[] = [
     seriesKo: '풀 베이비즈',
     description: '여름 수영장 테마 컬렉션',
     imageUrl: 'https://api.hjun.kr/hackathon/static/images/pucky.png',
-    popmartUrl: 'https://www.popmart.com/kr/products/pucky-pool-babies',
-    price: '₩17,900',
-    releaseDate: '2024-05',
-    isLimited: false
+    popmartUrl: 'https://www.popmart.com/kr/products/pucky-pool-babies'
   },
   {
     id: 'hirono-little',
@@ -99,10 +78,7 @@ export const toysData: Toy[] = [
     seriesKo: '리틀 미스치프',
     description: '장난꾸러기 히로노의 모험',
     imageUrl: 'https://api.hjun.kr/hackathon/static/images/hirono.png',
-    popmartUrl: 'https://www.popmart.com/kr/products/hirono-little-mischief',
-    price: '₩15,900',
-    releaseDate: '2024-03',
-    isLimited: false
+    popmartUrl: 'https://www.popmart.com/kr/products/hirono-little-mischief'
   },
   {
     id: 'kubo-roar',
@@ -112,10 +88,7 @@ export const toysData: Toy[] = [
     seriesKo: '로어 시리즈',
     description: '용감한 쿠보의 포효',
     imageUrl: 'https://api.hjun.kr/hackathon/static/images/kubo.png',
-    popmartUrl: 'https://www.popmart.com/kr/products/kubo-roar-series',
-    price: '₩16,900',
-    releaseDate: '2024-02',
-    isLimited: false
+    popmartUrl: 'https://www.popmart.com/kr/products/kubo-roar-series'
   },
   {
     id: 'bearbrick-400',
@@ -125,10 +98,7 @@ export const toysData: Toy[] = [
     seriesKo: '400% 시리즈',
     description: '리미티드 에디션 400% 사이즈',
     imageUrl: 'https://api.hjun.kr/hackathon/static/images/bearbrick.png',
-    popmartUrl: 'https://www.popmart.com/kr/products/bearbrick-400-limited',
-    price: '₩89,900',
-    releaseDate: '2023-11',
-    isLimited: true
+    popmartUrl: 'https://www.popmart.com/kr/products/bearbrick-400-limited'
   },
   {
     id: 'molang-sweet',
@@ -138,10 +108,7 @@ export const toysData: Toy[] = [
     seriesKo: '스위트 드림',
     description: '귀여운 토끼 캐릭터 한정판',
     imageUrl: 'https://api.hjun.kr/hackathon/static/images/molang.png',
-    popmartUrl: 'https://www.popmart.com/kr/products/molang-sweet-dream',
-    price: '₩22,900',
-    releaseDate: '2024-01',
-    isLimited: true
+    popmartUrl: 'https://www.popmart.com/kr/products/molang-sweet-dream'
   }
 ];
 

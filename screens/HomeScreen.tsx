@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ScrollView,
   SafeAreaView,
@@ -15,6 +15,7 @@ import {
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
 import { toysData } from '../utils/toysData';
+import { FavoriteManager } from '../utils/favoriteManager';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -121,13 +122,12 @@ const TrendingNumber = styled.Text`
 const TrendingImage = styled.Image`
   width: 120px;
   height: 120px;
-  background-color: #f0f0f0;
   margin-bottom: 8px;
   border-radius: 4px;
 `;
 
 const TrendingName = styled.Text`
-  font-size: 12px;
+  font-size: 10px;
   color: #636e72;
   text-align: center;
   width: 114px;
@@ -187,12 +187,6 @@ const ProductSubtext = styled.Text`
   margin-bottom: 5px;
 `;
 
-const LikeContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-`;
-
-
 const LikeCount = styled.Text`
   font-size: 12px;
   color: #ff4757;
@@ -204,7 +198,37 @@ const { width: screenWidth } = Dimensions.get('window');
 const CharacterShoppingApp = () => {
   const [activeTab, setActiveTab] = useState('ALL');
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [likeCounts, setLikeCounts] = useState<{[key: string]: number}>({});
   const navigation = useNavigation();
+
+  useEffect(() => {
+    loadFavorites();
+    initializeLikeCounts();
+  }, []);
+
+  const initializeLikeCounts = () => {
+    const counts: {[key: string]: number} = {};
+    toysData.forEach(toy => {
+      counts[toy.id] = Math.floor(Math.random() * 20 + 5);
+    });
+    setLikeCounts(counts);
+  };
+
+  const loadFavorites = async () => {
+    const favs = await FavoriteManager.getFavorites();
+    setFavorites(favs);
+  };
+
+  const handleToggleFavorite = async (itemId: string) => {
+    const isFavorite = await FavoriteManager.toggleFavorite(itemId);
+    await loadFavorites();
+    
+    setLikeCounts(prev => ({
+      ...prev,
+      [itemId]: isFavorite ? prev[itemId] + 1 : prev[itemId] - 1
+    }));
+  };
 
   const handleCharacterPress = (url: string) => {
     Linking.openURL(url);
@@ -215,7 +239,6 @@ const CharacterShoppingApp = () => {
       // "나와 잘 맞는 캐릭터는?" 배너 클릭 시 성격 테스트로 이동
       navigation.navigate('PersonalityTest' as never);
     }
-    // 다른 배너 처리 추가 가능
   };
 
   const trendingItems = [
@@ -302,48 +325,47 @@ const CharacterShoppingApp = () => {
 
   const products = getFilteredProducts();
 
-  const renderProduct = ({ item, index }) => (
-    <ProductCard 
-      style={{ marginRight: index % 2 === 0 ? '2%' : 0 }}
-      onPress={() => Linking.openURL(item.popmartUrl)}
-    >
-      <View style={{ position: 'relative' }}>
-        <ProductImage source={{ uri: item.imageUrl }} />
-        <View style={{ 
-          position: 'absolute', 
-          top: 10, 
-          right: 10, 
-          flexDirection: 'row', 
-          alignItems: 'center', 
-          backgroundColor: 'rgba(0,0,0,0.5)', 
-          paddingHorizontal: 8, 
-          paddingVertical: 4, 
-          borderRadius: 14 
-        }}>
-          <Text style={{ fontSize: 12 }}>❤️</Text>
-          <LikeCount style={{ color: 'white', marginLeft: 4 }}>{Math.floor(Math.random() * 20 + 5)}k</LikeCount>
+  const renderProduct = ({ item, index }) => {
+    const isFavorited = favorites.includes(item.id);
+    
+    return (
+      <ProductCard 
+        style={{ marginRight: index % 2 === 0 ? '2%' : 0 }}
+        onPress={() => Linking.openURL(item.popmartUrl)}
+      >
+        <View style={{ position: 'relative' }}>
+          <ProductImage source={{ uri: item.imageUrl }} />
+          <TouchableOpacity
+            style={{ 
+              position: 'absolute', 
+              top: 10, 
+              right: 10, 
+              flexDirection: 'row', 
+              alignItems: 'center', 
+              paddingHorizontal: 8, 
+              paddingVertical: 4, 
+              borderRadius: 14 
+            }}
+            onPress={(e) => {
+              e.stopPropagation();
+              handleToggleFavorite(item.id);
+            }}
+          >
+            <Image 
+              source={isFavorited ? require('../assets/heart1.png') : require('../assets/heart2.png')} 
+              style={{ width: 16, height: 16 }}
+            />
+            <LikeCount style={{ color: '#8C8C8C', marginLeft: 2 }}>{likeCounts[item.id] || 0}k</LikeCount>
+          </TouchableOpacity>
         </View>
-        {item.isLimited && (
-          <View style={{ 
-            position: 'absolute',
-            bottom: 10,
-            right: 10,
-            backgroundColor: '#ff4757',
-            paddingHorizontal: 8,
-            paddingVertical: 4,
-            borderRadius: 10
-          }}>
-            <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>LIMITED</Text>
-          </View>
-        )}
-      </View>
-      <ProductInfo>
-        <ProductName>{item.nameKo}</ProductName>
-        <ProductSubtext>{item.seriesKo}</ProductSubtext>
-        <ProductSubtext>{item.description}</ProductSubtext>
-      </ProductInfo>
-    </ProductCard>
-  );
+        <ProductInfo>
+          <ProductName>{item.nameKo}</ProductName>
+          <ProductSubtext>{item.seriesKo}</ProductSubtext>
+          <ProductSubtext>{item.description}</ProductSubtext>
+        </ProductInfo>
+      </ProductCard>
+    );
+  };
 
   return (
     <Container>
