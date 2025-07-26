@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
-import { SafeAreaView, StatusBar, ScrollView } from 'react-native';
+import { SafeAreaView, StatusBar, ScrollView, ActivityIndicator } from 'react-native';
+import ApiService, { User } from '../utils/api';
+import AsyncStorage from '../utils/storage';
 
-const Container = styled(SafeAreaView)`
+const Container = styled.View`
   flex: 1;
   background-color: #F1F1F1;
 `;
@@ -33,7 +35,6 @@ const ContentSection = styled.View`
   background-color: white;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
-  padding-top: 16px;
 `;
 
 const ProfileInfo = styled.View`
@@ -87,6 +88,17 @@ const ProfileRole = styled.Text`
   font-size: 14px;
 `;
 
+const UserNickname = styled.Text`
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 4px;
+`;
+
+const TestResultCharacter = styled.Text`
+  color: #6b7280;
+  font-size: 14px;
+`;
+
 const StatsContainer = styled.View`
   flex-direction: row;
   margin-top: 24px;
@@ -113,7 +125,7 @@ const SectionTitle = styled.Text`
   font-weight: 600;
   text-align: center;
   margin: 0 0 12px 0;
-  padding-top: 16px;
+  padding-top: 24px;
 `;
 
 const ItemCard = styled.TouchableOpacity`
@@ -176,52 +188,87 @@ const ActionIcon = styled.View`
 
 const ProfileScreen = () => {
   const [activeTab, setActiveTab] = useState<'favorites' | 'owned'>('favorites');
+  const [user, setUser] = useState<User | null>(null);
+  const [testResult, setTestResult] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadUserProfile();
+  }, []);
+
+  const loadUserProfile = async () => {
+    try {
+      setLoading(true);
+      // 유저 프로필 가져오기
+      const profileResponse = await ApiService.getProfile();
+      setUser(profileResponse.user);
+      
+      // 테스트 결과 가져오기 (AsyncStorage에서)
+      const savedResult = await AsyncStorage.getItem('personalityTestResult');
+      if (savedResult) {
+        const result = JSON.parse(savedResult);
+        setTestResult(result.character?.name || '');
+      }
+    } catch (error) {
+      console.error('Failed to load profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#F1F1F1', justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#ef4444" />
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <Container>
-      <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
-      <Header>
-        <HeaderTitle>내 프로필</HeaderTitle>
-        <HeaderSpacer />
-      </Header>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#F1F1F1' }}>
+      <Container>
+        <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
+        <Header>
+          <HeaderTitle>내 프로필</HeaderTitle>
+          <HeaderSpacer />
+        </Header>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <ProfileSection>
-          <ProfileInfo>
-            <ProfileImageContainer>
-              <ProfileImage>
-                {/* 프로필 이미지 */}
-              </ProfileImage>
-              <EditBadge>
-                <EditBadgeText>✏</EditBadgeText>
-              </EditBadge>
-            </ProfileImageContainer>
-            
-            <ProfileDetails>
-              <ProfileName>김지원</ProfileName>
-              <ProfileRole>팀장</ProfileRole>
-            </ProfileDetails>
-          </ProfileInfo>
+      <ProfileSection>
+        <ProfileInfo>
+          <ProfileImageContainer>
+            <ProfileImage>
+              {/* 프로필 이미지 */}
+            </ProfileImage>
+            <EditBadge>
+              <EditBadgeText>✏</EditBadgeText>
+            </EditBadge>
+          </ProfileImageContainer>
+          
+          <ProfileDetails>
+            <UserNickname>{user?.nickname || '사용자'}</UserNickname>
+            <TestResultCharacter>{testResult || '테스트를 진행해주세요'}</TestResultCharacter>
+          </ProfileDetails>
+        </ProfileInfo>
 
-          <StatsContainer>
-            <StatButton 
-              active={activeTab === 'favorites'} 
-              onPress={() => setActiveTab('favorites')}
-            >
-              <StatText active={activeTab === 'favorites'}>찜 14</StatText>
-            </StatButton>
-            <StatButton 
-              active={activeTab === 'owned'}
-              onPress={() => setActiveTab('owned')}
-            >
-              <StatText active={activeTab === 'owned'}>소유 캐릭터 7</StatText>
-            </StatButton>
-          </StatsContainer>
-        </ProfileSection>
+        <StatsContainer>
+          <StatButton 
+            active={activeTab === 'favorites'} 
+            onPress={() => setActiveTab('favorites')}
+          >
+            <StatText active={activeTab === 'favorites'}>찜 14</StatText>
+          </StatButton>
+          <StatButton 
+            active={activeTab === 'owned'}
+            onPress={() => setActiveTab('owned')}
+          >
+            <StatText active={activeTab === 'owned'}>소유 캐릭터 7</StatText>
+          </StatButton>
+        </StatsContainer>
+      </ProfileSection>
 
-        <ContentSection>
-          <SectionTitle>{activeTab === 'favorites' ? '찜 목록' : '소유 캐릭터'}</SectionTitle>
-
+      <ContentSection>
+        <SectionTitle>{activeTab === 'favorites' ? '찜 목록' : '소유 캐릭터'}</SectionTitle>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
           {activeTab === 'favorites' ? (
             <>
               <ItemCard>
@@ -313,9 +360,10 @@ const ProfileScreen = () => {
               </ItemCard>
             </>
           )}
-        </ContentSection>
-      </ScrollView>
-    </Container>
+        </ScrollView>
+      </ContentSection>
+      </Container>
+    </SafeAreaView>
   );
 };
 

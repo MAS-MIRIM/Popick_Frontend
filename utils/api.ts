@@ -1,5 +1,5 @@
 import AsyncStorage from './storage';
-import { personalityTestQuestions, personalityTestCharacters, calculatePersonalityTestResult } from './personalityTestData';
+import { personalityTestQuestions, personalityTestCharacters, calculatePersonalityTestResult, PersonalityTestResult } from './personalityTestData';
 
 const BASE_URL = 'http://api.hjun.kr/hackathon';
 
@@ -288,6 +288,15 @@ class ApiService {
     } catch (error) {
       console.log('[API] POST exception:', error);
       throw error;
+    }
+  }
+
+  static async savePersonalityTestResult(result: PersonalityTestResult): Promise<void> {
+    try {
+      await AsyncStorage.setItem('personalityTestResult', JSON.stringify(result));
+      await AsyncStorage.setItem('hasCompletedPersonalityTest', 'true');
+    } catch (error) {
+      console.error('Failed to save personality test result:', error);
     }
   }
 

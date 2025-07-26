@@ -67,7 +67,7 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Welcome"
+        initialRouteName={isAuthenticated ? (isFirstLogin ? "PersonalityTest" : "MainTabs") : "Welcome"}
         screenOptions={{headerShown: false}}>
         {!isAuthenticated ? (
           <>
@@ -83,8 +83,14 @@ const App = () => {
               {(props: NativeStackScreenProps<RootStackParamList, 'Login'>) => (
                 <LoginScreen
                   onLoginSuccess={async () => {
-                    const hasCompletedTest = await AsyncStorage.getItem('hasCompletedPersonalityTest');
-                    setIsFirstLogin(!hasCompletedTest);
+                    // \uccab \ud68c\uc6d0\uac00\uc785 \ud6c4 \ub85c\uadf8\uc778\uc778\uc9c0 \ud655\uc778
+                    const isFirstSignUp = await AsyncStorage.getItem('isFirstSignUp');
+                    if (isFirstSignUp === 'true') {
+                      setIsFirstLogin(true);
+                      await AsyncStorage.removeItem('isFirstSignUp');
+                    } else {
+                      setIsFirstLogin(false);
+                    }
                     setIsAuthenticated(true);
                   }}
                   onSignUpPress={() => props.navigation.navigate('SignUp')}
@@ -105,20 +111,21 @@ const App = () => {
           </>
         ) : (
           <>
-            {isFirstLogin ? (
-              <Stack.Screen name="PersonalityTest">
-                {() => (
-                  <PersonalityTestScreen
-                    onComplete={async (result) => {
-                      await AsyncStorage.setItem('hasCompletedPersonalityTest', 'true');
-                      setIsFirstLogin(false);
-                    }}
-                  />
-                )}
-              </Stack.Screen>
-            ) : (
-              <Stack.Screen name="MainTabs" component={TabNavigator} />
-            )}
+            <Stack.Screen 
+              name="MainTabs" 
+              component={TabNavigator} 
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name="PersonalityTest">
+              {() => (
+                <PersonalityTestScreen
+                  onComplete={async (result) => {
+                    await AsyncStorage.setItem('hasCompletedPersonalityTest', 'true');
+                    setIsFirstLogin(false);
+                  }}
+                />
+              )}
+            </Stack.Screen>
           </>
         )}
       </Stack.Navigator>

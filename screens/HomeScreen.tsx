@@ -13,6 +13,7 @@ import {
   Dimensions,
 } from 'react-native';
 import styled from 'styled-components/native';
+import { useNavigation } from '@react-navigation/native';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -202,22 +203,91 @@ const { width: screenWidth } = Dimensions.get('window');
 const CharacterShoppingApp = () => {
   const [activeTab, setActiveTab] = useState('ALL');
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  const navigation = useNavigation();
 
   const handleCharacterPress = (url: string) => {
     Linking.openURL(url);
   };
 
+  const handleBannerPress = (bannerId: string) => {
+    if (bannerId === '1') {
+      // "나와 잘 맞는 캐릭터는?" 배너 클릭 시 성격 테스트로 이동
+      navigation.navigate('PersonalityTest' as never);
+    }
+    // 다른 배너 처리 추가 가능
+  };
+
   const trendingItems = [
-    { id: 1, rank: '1', name: 'Pop Mart Labubu The...', image: require('../assets/no1.png'), url: 'https://www.popmart.com/labubu1' },
-    { id: 2, rank: '2', name: 'Pop Mart Labubu The...', image: require('../assets/no2.png'), url: 'https://www.popmart.com/labubu2' },
-    { id: 3, rank: '3', name: 'Pop Mart Labubu The...', image: require('../assets/no3.png'), url: 'https://www.popmart.com/labubu3' },
-    { id: 4, rank: '4', name: 'Pop Mart Labubu The...', image: require('../assets/no4.png'), url: 'https://www.popmart.com/labubu4' },
-    { id: 5, rank: '5', name: 'Pop Mart Labubu The...', image: require('../assets/no5.png'), url: 'https://www.popmart.com/labubu5' },
-    { id: 6, rank: '6', name: 'Pop Mart Labubu The...', image: require('../assets/no6.png'), url: 'https://www.popmart.com/labubu6' },
-    { id: 7, rank: '7', name: 'Pop Mart Labubu The...', image: require('../assets/no7.png'), url: 'https://www.popmart.com/labubu7' },
-    { id: 8, rank: '8', name: 'Pop Mart Labubu The...', image: require('../assets/no8.png'), url: 'https://www.popmart.com/labubu8' },
-    { id: 9, rank: '9', name: 'Pop Mart Labubu The...', image: require('../assets/no9.png'), url: 'https://www.popmart.com/labubu9' },
-    { id: 10, rank: '10', name: 'Pop Mart Labubu The...', image: require('../assets/no10.png'), url: 'https://www.popmart.com/labubu10' },
+    { 
+      id: 1, 
+      rank: '1', 
+      name: 'Pop Mart Labubu The...', 
+      image: require('../assets/no1.png'), 
+      url: 'https://www.popmart.com/labubu1' 
+    },
+    { 
+      id: 2, 
+      rank: '2', 
+      name: 'Pop Mart Labubu The...', 
+      image: require('../assets/no2.png'), 
+      url: 'https://www.popmart.com/labubu2' 
+    },
+    { 
+      id: 3, 
+      rank: '3', 
+      name: 'Pop Mart Labubu The...', 
+      image: require('../assets/no3.png'), 
+      url: 'https://www.popmart.com/labubu3' 
+    },
+    { 
+      id: 4, 
+      rank: '4', 
+      name: 'Pop Mart Labubu The...', 
+      image: require('../assets/no4.png'), 
+      url: 'https://www.popmart.com/labubu4' 
+    },
+    { 
+      id: 5, 
+      rank: '5', 
+      name: 'Pop Mart Labubu The...', 
+      image: require('../assets/no5.png'), 
+      url: 'https://www.popmart.com/labubu5' 
+    },
+    { 
+      id: 6, 
+      rank: '6', 
+      name: 'Pop Mart Labubu The...', 
+      image: require('../assets/no6.png'), 
+      url: 'https://www.popmart.com/labubu6' 
+    },
+    { 
+      id: 7, 
+      rank: '7', 
+      name: 'Pop Mart Labubu The...', 
+      image: require('../assets/no7.png'), 
+      url: 'https://www.popmart.com/labubu7' 
+    },
+    { 
+      id: 8, 
+      rank: '8', 
+      name: 'Pop Mart Labubu The...', 
+      image: require('../assets/no8.png'), 
+      url: 'https://www.popmart.com/labubu8' 
+    },
+    { 
+      id: 9, 
+      rank: '9', 
+      name: 'Pop Mart Labubu The...', 
+      image: require('../assets/no9.png'), 
+      url: 'https://www.popmart.com/labubu9' 
+    },
+    { 
+      id: 10, 
+      rank: '10', 
+      name: 'Pop Mart Labubu The...', 
+      image: require('../assets/no10.png'), 
+      url: 'https://www.popmart.com/labubu10' 
+    }
   ];
 
   const tabs = ['ALL', '디무', '라부부', '몰리', '스컬판다', '지거', '크라이베이비', '키노', '피노젤리', '푸키', '하치푸푸'];
@@ -244,7 +314,7 @@ const CharacterShoppingApp = () => {
           backgroundColor: 'rgba(0,0,0,0.5)', 
           paddingHorizontal: 8, 
           paddingVertical: 4, 
-          borderRadius: 12 
+          borderRadius: 14 
         }}>
           <Text style={{ fontSize: 12 }}>❤️</Text>
           <LikeCount style={{ color: 'white', marginLeft: 4 }}>{item.likes}</LikeCount>
@@ -290,7 +360,11 @@ const CharacterShoppingApp = () => {
             ]}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <View style={{ width: screenWidth - 32, alignItems: 'center', justifyContent: 'center', padding: 10 }}>
+              <TouchableOpacity 
+                style={{ width: screenWidth - 32, alignItems: 'center', justifyContent: 'center', padding: 10 }}
+                onPress={() => handleBannerPress(item.id)}
+                activeOpacity={0.8}
+              >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                   <Image 
                     source={item.image} 
@@ -310,7 +384,7 @@ const CharacterShoppingApp = () => {
                   {item.title}
                 </Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             )}
             onScroll={(event) => {
               const index = Math.round(event.nativeEvent.contentOffset.x / (screenWidth - 32));

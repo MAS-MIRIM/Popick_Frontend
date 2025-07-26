@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components/native';
 import { ImageBackground, Alert, ActivityIndicator, Image } from 'react-native';
 import ApiService from '../utils/api';
+import AsyncStorage from '../utils/storage';
+import { PersonalityTestResult } from '../utils/personalityTestData';
+import PersonalityTestResultScreen from './PersonalityTestResultScreen';
 
 interface Question {
   id: number;
@@ -14,19 +17,8 @@ interface Question {
   charactersBKo: string[];
 }
 
-interface TestResult {
-  character: {
-    name: string;
-    nameKo: string;
-    description: string;
-    traits: string[];
-  };
-  scores: Record<string, number>;
-  matchPercentage: number;
-}
-
 type PersonalityTestScreenProps = {
-  onComplete: (result: TestResult) => void;
+  onComplete: (result: PersonalityTestResult) => void;
 };
 
 const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
@@ -35,6 +27,10 @@ const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
   const [answers, setAnswers] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<'A' | 'B' | null>(null);
   const [loading, setLoading] = useState(true);
+  const [testResult, setTestResult] = useState<PersonalityTestResult | null>(null);
+  const [showResult, setShowResult] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const processingRef = useRef(false);
 
   useEffect(() => {
     fetchQuestions();
@@ -43,6 +39,8 @@ const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
   const fetchQuestions = async () => {
     try {
       const response = await ApiService.get('/personality-test/questions');
+      console.log('[PersonalityTest] Loaded questions:', response.length);
+      console.log('[PersonalityTest] Questions:', response.map(q => q.id));
       setQuestions(response);
       setLoading(false);
     } catch (error: any) {
@@ -58,15 +56,67 @@ const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
       return;
     }
 
-    const newAnswers = [...answers, selectedOption];
-    setAnswers(newAnswers);
+    // 중복 클릭 방지 (ref로 즉시 체크)
+    if (processingRef.current) {
+      console.log('[PersonalityTest] Already processing (ref), ignoring click');
+      return;
+    }
 
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedOption(null);
-    } else {
-      // 마지막 질문인 경우 결과 제출
-      submitAnswers(newAnswers);
+    // 중복 클릭 방지 (state로도 체크)
+    if (isProcessing) {
+      console.log('[PersonalityTest] Already processing (state), ignoring click');
+      return;
+    }
+
+    // 답변 개수 초과 방지
+    if (answers.length >= 10) {
+      console.error('[PersonalityTest] Already have 10 answers, preventing additional submission');
+      return;
+    }
+
+    // 즉시 처리 중 플래그 설정
+    processingRef.current = true;
+    setIsProcessing(true);
+
+    console.log('[PersonalityTest] handleNext called:');
+    console.log('  - Current question index:', currentQuestionIndex);
+    console.log('  - Total questions:', questions.length);
+    console.log('  - Current answers:', answers);
+    console.log('  - Selected option:', selectedOption);
+
+    try {
+      if (currentQuestionIndex < questions.length - 1) {
+        // 다음 질문으로
+        const newAnswers = [...answers, selectedOption];
+        console.log('[PersonalityTest] Moving to next question, new answers:', newAnswers);
+        setAnswers(newAnswers);
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        setSelectedOption(null);
+        setIsProcessing(false);
+        processingRef.current = false;
+      } else {
+        // 마지막 질문인 경우 결과 제출
+        const finalAnswers = [...answers, selectedOption];
+        console.log('[PersonalityTest] Final question reached');
+        console.log('[PersonalityTest] Final answers:', finalAnswers);
+        console.log('[PersonalityTest] Total answers:', finalAnswers.length);
+        
+        if (finalAnswers.length !== 10) {
+          console.error('[PersonalityTest] Invalid answer count:', finalAnswers.length);
+          console.error('[PersonalityTest] Expected 10, got', finalAnswers.length);
+          Alert.alert('오류', `답변 개수가 올바르지 않습니다. (${finalAnswers.length}개)`);
+          setIsProcessing(false);
+          processingRef.current = false;
+          return;
+        }
+        
+        // 결과 제출 (isProcessing은 submitAnswers에서 해제)
+        submitAnswers(finalAnswers);
+      }
+    } catch (error) {
+      console.error('[PersonalityTest] Error in handleNext:', error);
+      setIsProcessing(false);
+      processingRef.current = false;
     }
   };
 
@@ -76,12 +126,34 @@ const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
       const result = await ApiService.post('/personality-test/result', {
         answers: finalAnswers
       });
+      
+      // Save result to AsyncStorage
+      await AsyncStorage.setItem('personalityTestResult', JSON.stringify(result));
+      await AsyncStorage.setItem('hasCompletedPersonalityTest', 'true');
+      
+      setTestResult(result);
+      setShowResult(true);
+      setLoading(false);
+      setIsProcessing(false);
+      processingRef.current = false;
+      
+      // Call onComplete after showing result
       onComplete(result);
     } catch (error: any) {
       console.error('Failed to submit answers:', error);
       Alert.alert('오류', '결과를 제출하는 중 문제가 발생했습니다.');
       setLoading(false);
+      setIsProcessing(false);
+      processingRef.current = false;
     }
+  };
+
+  const handleRetakeTest = () => {
+    setCurrentQuestionIndex(0);
+    setAnswers([]);
+    setSelectedOption(null);
+    setShowResult(false);
+    setTestResult(null);
   };
 
   if (loading || questions.length === 0) {
@@ -90,6 +162,11 @@ const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
         <ActivityIndicator size="large" color="#F63F4E" />
       </LoadingContainer>
     );
+  }
+
+  // Show result screen if test is completed
+  if (showResult && testResult) {
+    return <PersonalityTestResultScreen result={testResult} onRetake={handleRetakeTest} />;
   }
 
   const currentQuestion = questions[currentQuestionIndex];
@@ -134,8 +211,8 @@ const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
         
         <NextButton 
           onPress={handleNext}
-          disabled={!selectedOption}
-          active={!!selectedOption}
+          disabled={!selectedOption || isProcessing}
+          active={!!selectedOption && !isProcessing}
         >
           <NextButtonText>다음으로</NextButtonText>
         </NextButton>

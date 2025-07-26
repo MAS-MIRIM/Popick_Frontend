@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import styled from 'styled-components/native';
 import {Alert} from 'react-native';
 import ApiService from '../utils/api';
+import AsyncStorage from '../utils/storage';
 
 type SignUpScreenProps = {
   onSignUpSuccess: () => void;
@@ -116,6 +117,8 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
           
           // 회원가입 성공 후 자동 로그인
           await ApiService.login(userId, password);
+          // 첫 회원가입 표시
+          await AsyncStorage.setItem('isFirstSignUp', 'true');
           onSignUpSuccess();
         } catch (error: any) {
           if (error.statusCode === 409) {

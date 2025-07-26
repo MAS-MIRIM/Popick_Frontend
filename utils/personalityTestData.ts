@@ -104,70 +104,94 @@ export const personalityTestQuestions = [
   }
 ];
 
-export const personalityTestCharacters = {
+export interface PersonalityTestCharacter {
+  name: string;
+  nameKo: string;
+  description: string;
+  traits: string[];
+  imageUrl?: string;
+}
+
+export interface PersonalityTestResult {
+  character: PersonalityTestCharacter;
+  scores: Record<string, number>;
+  matchPercentage: number;
+}
+
+export const personalityTestCharacters: Record<string, PersonalityTestCharacter> = {
   dimu: {
     name: "dimu",
     nameKo: "디무",
     description: "조용하고 내성적이지만 깊은 감성을 가진 캐릭터",
-    traits: ["내향적", "감성적", "성장형", "외로움을 느끼기도 함"]
+    traits: ["내향적", "감성적", "성장형", "외로움을 느끼기도 함"],
+    imageUrl: "https://api.hjun.kr/hackathon/static/images/dimu.png"
   },
   kubo: {
     name: "kubo",
     nameKo: "쿠보",
     description: "신비롭고 조용하며 이성적인 면이 강한 캐릭터",
-    traits: ["내향적", "신비로움", "이성적", "독립적"]
+    traits: ["내향적", "신비로움", "이성적", "독립적"],
+    imageUrl: "https://api.hjun.kr/hackathon/static/images/kubo.png"
   },
   rabubu: {
     name: "rabubu",
     nameKo: "라부부",
     description: "사교적이고 모험을 좋아하는 활발한 캐릭터",
-    traits: ["외향적", "모험적", "장난기", "친화적"]
+    traits: ["외향적", "모험적", "장난기", "친화적"],
+    imageUrl: "https://api.hjun.kr/hackathon/static/images/rabubu.png"
   },
   molly: {
     name: "molly",
     nameKo: "몰리",
     description: "긍정적이고 밝으며 사교적인 캐릭터",
-    traits: ["외향적", "긍정적", "밝음", "사교적"]
+    traits: ["외향적", "긍정적", "밝음", "사교적"],
+    imageUrl: "https://api.hjun.kr/hackathon/static/images/molly.png"
   },
   crybaby: {
     name: "crybaby",
     nameKo: "크라이베이비",
     description: "감정 표현이 풍부하고 감수성이 뛰어난 캐릭터",
-    traits: ["감정 표현", "감수성", "친화적", "눈물이 많음"]
+    traits: ["감정 표현", "감수성", "친화적", "눈물이 많음"],
+    imageUrl: "https://api.hjun.kr/hackathon/static/images/crybaby.png"
   },
   pinojelly: {
     name: "pinojelly",
     nameKo: "피노젤리",
     description: "감정 표현이 자유롭고 긍정적인 에너지를 가진 캐릭터",
-    traits: ["감정 표현", "긍정적", "장난기", "밝음"]
+    traits: ["감정 표현", "긍정적", "장난기", "밝음"],
+    imageUrl: "https://api.hjun.kr/hackathon/static/images/pinojelly.png"
   },
   skullpanda: {
     name: "skullpanda",
     nameKo: "스컬판다",
     description: "신비롭고 차분하며 독립적인 성향의 캐릭터",
-    traits: ["신비로움", "차분함", "이성적", "독립적"]
+    traits: ["신비로움", "차분함", "이성적", "독립적"],
+    imageUrl: "https://api.hjun.kr/hackathon/static/images/skullpanda.png"
   },
   hachi: {
     name: "hachi",
     nameKo: "하치푸푸",
     description: "모험을 좋아하고 계속 성장하는 캐릭터",
-    traits: ["모험적", "성장형", "활발함", "호기심"]
+    traits: ["모험적", "성장형", "활발함", "호기심"],
+    imageUrl: "https://api.hjun.kr/hackathon/static/images/hachi.png"
   },
   jigger: {
     name: "jigger",
     nameKo: "지거",
     description: "내성적이고 부끄러움이 많지만 외로움을 느끼는 캐릭터",
-    traits: ["내성적", "부끄러움", "외로움", "조용함"]
+    traits: ["내성적", "부끄러움", "외로움", "조용함"],
+    imageUrl: "https://api.hjun.kr/hackathon/static/images/jigger.png"
   },
   pooky: {
     name: "pooky",
     nameKo: "푸키",
     description: "복잡한 내면을 가지고 있으며 기분 변화가 있는 캐릭터",
-    traits: ["복잡한 내면", "기분 변화", "어둠과 빛", "감정적"]
+    traits: ["복잡한 내면", "기분 변화", "어둠과 빛", "감정적"],
+    imageUrl: "https://api.hjun.kr/hackathon/static/images/pooky.png"
   }
 };
 
-export function calculatePersonalityTestResult(answers: string[]): any {
+export function calculatePersonalityTestResult(answers: string[]): PersonalityTestResult {
   // 각 캐릭터별 점수 계산
   const scores: Record<string, number> = {};
   
