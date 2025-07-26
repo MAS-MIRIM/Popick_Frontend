@@ -1,0 +1,78 @@
+{
+  "name": "uslashthon",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:auto": "node scripts/watch-and-test.js",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.0",
+    "@react-native-google-signin/google-signin": "^15.0.0",
+    "@react-navigation/native": "^6.1.18",
+    "@react-navigation/native-stack": "^6.5.0",
+    "@react-navigation/stack": "^6.4.1",
+    "react": "18.1.0",
+    "react-hook-form": "^7.61.1",
+    "react-native": "0.70.10",
+    "react-native-gesture-handler": "^2.27.2",
+    "react-native-reanimated": "^2.17.0",
+    "react-native-safe-area-context": "^5.5.2",
+    "react-native-screens": "^3.15.0",
+    "react-native-svg": "^15.12.0",
+    "styled-components": "^5.3.11",
+    "yup": "^1.6.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.9",
+    "@babel/runtime": "^7.12.5",
+    "@react-native-community/eslint-config": "^2.0.0",
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^11.5.4",
+    "@tsconfig/react-native": "^2.0.2",
+    "@types/jest": "^26.0.23",
+    "@types/react": "^18.0.21",
+    "@types/react-native": "^0.70.6",
+    "@types/react-test-renderer": "^18.0.0",
+    "@types/styled-components": "^5.1.34",
+    "@types/styled-components-react-native": "^5.2.5",
+    "@typescript-eslint/eslint-plugin": "^5.37.0",
+    "@typescript-eslint/parser": "^5.37.0",
+    "babel-jest": "^26.6.3",
+    "eslint": "^7.32.0",
+    "jest": "^26.6.3",
+    "jest-styled-components": "^7.2.0",
+    "metro-react-native-babel-preset": "0.72.3",
+    "react-test-renderer": "18.1.0",
+    "typescript": "^4.8.3"
+  },
+  "jest": {
+    "preset": "react-native",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
+    "transform": {
+      "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/jest.transformer.js"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(react-native|@react-native|react-native-screens|react-native-reanimated|react-native-gesture-handler|react-native-safe-area-context|@react-navigation|react-native-svg|styled-components)/)"
+    ],
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
+      "^styled-components$": "styled-components/native"
+    }
+  }
+}
