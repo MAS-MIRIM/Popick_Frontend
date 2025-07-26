@@ -296,49 +296,49 @@ const CharacterShoppingApp = () => {
       rank: '1', 
       name: 'Pop Mart Labubu The...', 
       image: require('../assets/no1.png'), 
-      url: 'https://www.popmart.com/labubu1' 
+      url: 'https://www.popmart.co.kr/product/the-monsters-%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95-%ED%82%A4%EB%A7%81/1920/category/87/display/1/' 
     },
     { 
       id: 2, 
       rank: '2', 
       name: 'Pop Mart Labubu The...', 
       image: require('../assets/no2.png'), 
-      url: 'https://www.popmart.com/labubu2' 
+      url: 'https://www.popmart.co.kr/product/the-monsters-%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95-%ED%82%A4%EB%A7%81/1920/category/87/display/1/' 
     },
     { 
       id: 3, 
       rank: '3', 
       name: 'Pop Mart Labubu The...', 
       image: require('../assets/no3.png'), 
-      url: 'https://www.popmart.com/labubu3' 
+      url: 'https://www.popmart.co.kr/product/the-monsters-%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95-%ED%82%A4%EB%A7%81/1920/category/87/display/1/' 
     },
     { 
       id: 4, 
       rank: '4', 
       name: 'Pop Mart Labubu The...', 
       image: require('../assets/no4.png'), 
-      url: 'https://www.popmart.com/labubu4' 
+      url: 'https://www.popmart.co.kr/product/the-monsters-%EC%88%98%EC%83%81%ED%95%9C-%ED%8E%B8%EC%9D%98%EC%A0%90-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B4%EC%96%B4%ED%8F%B0-%EB%B0%B1/1981/category/87/display/1/' 
     },
     { 
       id: 5, 
       rank: '5', 
       name: 'Pop Mart Labubu The...', 
       image: require('../assets/no5.png'), 
-      url: 'https://www.popmart.com/labubu5' 
+      url: 'https://www.popmart.co.kr/product/%ED%81%AC%EB%9D%BC%EC%9D%B4%EB%B2%A0%EC%9D%B4%EB%B9%84-%EC%82%AC%EB%9E%91%EC%9D%98-%EB%88%88%EB%AC%BC-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95/1803/category/206/display/1/' 
     },
     { 
       id: 6, 
       rank: '6', 
       name: 'Pop Mart Labubu The...', 
       image: require('../assets/no6.png'), 
-      url: 'https://www.popmart.com/labubu6' 
+      url: 'https://www.popmart.co.kr/product/the-monsters-%EC%B2%B4%ED%81%AC%EB%A9%94%EC%9D%B4%ED%8A%B8-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95-%ED%82%A4%EB%A7%81/1811/category/87/display/1/' 
     },
     { 
       id: 7, 
       rank: '7', 
       name: 'Pop Mart Labubu The...', 
       image: require('../assets/no7.png'), 
-      url: 'https://www.popmart.com/labubu7' 
+      url: 'https://www.popmart.co.kr/product/%EB%9D%BC%EB%B6%80%EB%B6%80-%EC%BD%94%EC%B9%B4%EC%BD%9C%EB%9D%BC-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95-%ED%82%A4%EB%A7%81/1772/category/87/display/1/' 
     },
     { 
       id: 8, 
@@ -498,7 +498,7 @@ const CharacterShoppingApp = () => {
               <SectionTitle>지금 뜨는 캐릭터</SectionTitle>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
                 <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#F63F4E', marginRight: 6 }} />
-                <Text style={{ fontSize: 10, fontWeight: '500', color: '#636e72' }}>오늘 18시 기준</Text>
+                <Text style={{ fontSize: 10, fontWeight: '500', color: '#636e72' }}>오늘 0시 기준</Text>
               </View>
               <TrendingList horizontal showsHorizontalScrollIndicator={false}>
                 {trendingItems.map((item) => (
