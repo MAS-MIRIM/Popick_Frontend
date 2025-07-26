@@ -20,7 +20,6 @@ import { FavoriteManager } from '../utils/favoriteManager';
 const Container = styled(SafeAreaView)`
   flex: 1;
   background-color: #fff;
-  padding: 16px 0;
 `;
 
 const Header = styled.View`
@@ -49,7 +48,7 @@ const IconImage = styled.Image`
 
 const MainBanner = styled.View`
   height: 315px;
-  margin-bottom: 20px;
+  margin: 0 -16px 20px -16px;
 `;
 
 const PageIndicator = styled.View`
@@ -68,7 +67,7 @@ const Dot = styled.View`
 `;
 
 const SearchBar = styled.View`
-  margin: 0 16px 20px;
+  margin: 0 8px 20px;
   background-color: #ff4757;
   border-radius: 25px;
   flex-direction: row;
@@ -88,7 +87,7 @@ const SearchIcon = styled.Image`
 `;
 
 const TrendingSection = styled.View`
-  padding: 0 16px;
+  padding: 0 8px;
   margin-bottom: 20px;
 `;
 
@@ -134,7 +133,7 @@ const TrendingName = styled.Text`
 `;
 
 const TabSection = styled.View`
-  padding: 0 16px;
+  padding: 0 8px;
 `;
 
 const TabContainer = styled.ScrollView`
@@ -155,7 +154,7 @@ const TabText = styled.Text`
 `;
 
 const ProductGrid = styled.View`
-  padding: 0 16px;
+  padding: 0;
 `;
 
 const ProductCard = styled(TouchableOpacity)`
@@ -378,108 +377,108 @@ const CharacterShoppingApp = () => {
         </NotificationIcon>
       </Header>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <MainBanner>
-          <FlatList
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            data={[
-              { id: '1', image: require('../assets/ad1.png'), title: '나와 잘 맞는\n캐릭터는?' },
-              { id: '2', image: require('../assets/ad2.png'), title: '리사도 이제\n크라이베이비' }
-            ]}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity 
-                style={{ width: screenWidth - 32, alignItems: 'center', justifyContent: 'center', padding: 10 }}
-                onPress={() => handleBannerPress(item.id)}
-                activeOpacity={0.8}
-              >
-                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                  <Image 
-                    source={item.image} 
-                    style={{ width: 348, height: 306, borderRadius: 12 }} 
-                  />
-                  <Text style={{
-                    position: 'absolute',
-                    bottom: 30,
-                    left: 30,
-                  color: 'white',
-                  fontSize: 24,
-                  fontWeight: 'bold',
-                  textShadowColor: 'rgba(0, 0, 0, 0.5)',
-                  textShadowOffset: { width: 0, height: 2 },
-                  textShadowRadius: 4
-                }}>
-                  {item.title}
-                </Text>
-                </View>
-              </TouchableOpacity>
-            )}
-            onScroll={(event) => {
-              const index = Math.round(event.nativeEvent.contentOffset.x / (screenWidth - 32));
-              setCurrentBannerIndex(index);
-            }}
-            scrollEventThrottle={16}
-          />
-        </MainBanner>
-        
-        <PageIndicator>
-          <Dot active={currentBannerIndex === 0} />
-          <Dot active={currentBannerIndex === 1} />
-        </PageIndicator>
+      <FlatList
+        data={products}
+        renderItem={renderProduct}
+        keyExtractor={item => item.id.toString()}
+        numColumns={2}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 16 }}
+        ListHeaderComponent={() => (
+          <>
+            <MainBanner>
+              <FlatList
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                data={[
+                  { id: '1', image: require('../assets/ad1.png'), title: '나와 잘 맞는\n캐릭터는?' },
+                  { id: '2', image: require('../assets/ad2.png'), title: '리사도 이제\n크라이베이비' }
+                ]}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity 
+                    style={{ width: screenWidth - 32, alignItems: 'center', justifyContent: 'center', padding: 10 }}
+                    onPress={() => handleBannerPress(item.id)}
+                    activeOpacity={0.8}
+                  >
+                    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                      <Image 
+                        source={item.image} 
+                        style={{ width: 348, height: 306, borderRadius: 12 }} 
+                      />
+                      <Text style={{
+                        position: 'absolute',
+                        bottom: 30,
+                        left: 30,
+                      color: 'white',
+                      fontSize: 24,
+                      fontWeight: 'bold',
+                      textShadowColor: 'rgba(0, 0, 0, 0.5)',
+                      textShadowOffset: { width: 0, height: 2 },
+                      textShadowRadius: 4
+                    }}>
+                      {item.title}
+                    </Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+                onScroll={(event) => {
+                  const index = Math.round(event.nativeEvent.contentOffset.x / (screenWidth - 32));
+                  setCurrentBannerIndex(index);
+                }}
+                scrollEventThrottle={16}
+              />
+            </MainBanner>
+            
+            <PageIndicator>
+              <Dot active={currentBannerIndex === 0} />
+              <Dot active={currentBannerIndex === 1} />
+            </PageIndicator>
 
-        <SearchBar>
-          <SearchInput 
-            placeholder="검색"
-            placeholderTextColor="#fff"
-          />
-          <SearchIcon source={require('../assets/search.png')} />
-        </SearchBar>
+            <SearchBar>
+              <SearchInput 
+                placeholder="검색"
+                placeholderTextColor="#fff"
+              />
+              <SearchIcon source={require('../assets/search.png')} />
+            </SearchBar>
 
-        <TrendingSection>
-          <SectionTitle>지금 뜨는 캐릭터</SectionTitle>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
-            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#F63F4E', marginRight: 6 }} />
-            <Text style={{ fontSize: 10, fontWeight: '500', color: '#636e72' }}>오늘 18시 기준</Text>
-          </View>
-          <TrendingList horizontal showsHorizontalScrollIndicator={false}>
-            {trendingItems.map((item) => (
-              <TrendingItem key={item.id} onPress={() => handleCharacterPress(item.url)}>
-                <View>
-                  <TrendingImage source={item.image} />
-                  <TrendingNumber>{item.rank}</TrendingNumber>
-                </View>
-                <TrendingName>{item.name}</TrendingName>
-              </TrendingItem>
-            ))}
-          </TrendingList>
-        </TrendingSection>
+            <TrendingSection>
+              <SectionTitle>지금 뜨는 캐릭터</SectionTitle>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
+                <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#F63F4E', marginRight: 6 }} />
+                <Text style={{ fontSize: 10, fontWeight: '500', color: '#636e72' }}>오늘 18시 기준</Text>
+              </View>
+              <TrendingList horizontal showsHorizontalScrollIndicator={false}>
+                {trendingItems.map((item) => (
+                  <TrendingItem key={item.id} onPress={() => handleCharacterPress(item.url)}>
+                    <View>
+                      <TrendingImage source={item.image} />
+                      <TrendingNumber>{item.rank}</TrendingNumber>
+                    </View>
+                    <TrendingName>{item.name}</TrendingName>
+                  </TrendingItem>
+                ))}
+              </TrendingList>
+            </TrendingSection>
 
-        <TabSection>
-          <TabContainer horizontal showsHorizontalScrollIndicator={false}>
-            {tabs.map((tab) => (
-              <Tab 
-                key={tab} 
-                active={activeTab === tab}
-                onPress={() => setActiveTab(tab)}
-              >
-                <TabText active={activeTab === tab}>{tab}</TabText>
-              </Tab>
-            ))}
-          </TabContainer>
-        </TabSection>
-
-        <ProductGrid>
-          <FlatList
-            data={products}
-            renderItem={renderProduct}
-            keyExtractor={item => item.id.toString()}
-            numColumns={2}
-            scrollEnabled={false}
-          />
-        </ProductGrid>
-      </ScrollView>
+            <TabSection>
+              <TabContainer horizontal showsHorizontalScrollIndicator={false}>
+                {tabs.map((tab) => (
+                  <Tab 
+                    key={tab} 
+                    active={activeTab === tab}
+                    onPress={() => setActiveTab(tab)}
+                  >
+                    <TabText active={activeTab === tab}>{tab}</TabText>
+                  </Tab>
+                ))}
+              </TabContainer>
+            </TabSection>
+          </>
+        )}
+      />
     </Container>
   );
 };

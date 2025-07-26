@@ -211,7 +211,7 @@ const DogamScreen = () => {
   const [loading, setLoading] = useState(true);
 
   // 예시로 소유한 캐릭터 ID들 (실제로는 AsyncStorage에서 불러와야 함)
-  const defaultOwnedIds = ['molly-castle', 'dimoo-world', 'bearbrick-400', 'molang-sweet'];
+  const defaultOwnedIds: string[] = [];
 
   useEffect(() => {
     loadOwnedToys();
@@ -287,6 +287,58 @@ const DogamScreen = () => {
     </CollectionItem>
   );
 
+  const ListHeader = () => (
+    <>
+      {/* 진행률 */}
+      <ProgressContainer>
+        <ProgressText>전체 수집률: {completionRate}% ({ownedToys.length}/{toysData.length})</ProgressText>
+        <ProgressBar>
+          <ProgressFill width={completionRate} />
+        </ProgressBar>
+      </ProgressContainer>
+
+      {/* 내가 모은 캐릭터 */}
+      <Section>
+        <SectionHeader>
+          <SectionTitle>내가 모은 캐릭터</SectionTitle>
+          <SectionSubtitle>총 {ownedToys.length}개의 캐릭터를 모았어요!</SectionSubtitle>
+        </SectionHeader>
+      </Section>
+    </>
+  );
+
+  const ListFooter = () => (
+    <>
+      {/* 추천 시리즈 */}
+      {recommendedSeries.length > 0 && (
+        <Section>
+          <SectionHeader>
+            <SectionTitle>이 시리즈를 완성해보세요!</SectionTitle>
+            <SectionSubtitle>조금만 더 모으면 시리즈를 완성할 수 있어요</SectionSubtitle>
+          </SectionHeader>
+          
+          {recommendedSeries.map(series => {
+            const ownedCount = series.toys.filter(toy => ownedToys.includes(toy.id)).length;
+            return (
+              <SeriesCard key={series.name}>
+                <SeriesImage source={{ uri: series.firstToyImage }} />
+                <SeriesInfo>
+                  <SeriesName>{series.nameKo}</SeriesName>
+                  <SeriesDescription>
+                    {ownedCount}/{series.toys.length}개 보유중
+                  </SeriesDescription>
+                  <SeriesCount>
+                    {series.toys.length - ownedCount}개만 더 모으면 완성!
+                  </SeriesCount>
+                </SeriesInfo>
+              </SeriesCard>
+            );
+          })}
+        </Section>
+      )}
+    </>
+  );
+
   return (
     <Container>
       <Header>
@@ -294,68 +346,28 @@ const DogamScreen = () => {
         <HeaderSubtitle>내가 모은 캐릭터 컬렉션</HeaderSubtitle>
       </Header>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* 진행률 */}
-        <ProgressContainer>
-          <ProgressText>전체 수집률: {completionRate}% ({ownedToys.length}/{toysData.length})</ProgressText>
-          <ProgressBar>
-            <ProgressFill width={completionRate} />
-          </ProgressBar>
-        </ProgressContainer>
-
-        {/* 내가 모은 캐릭터 */}
-        <Section>
-          <SectionHeader>
-            <SectionTitle>내가 모은 캐릭터</SectionTitle>
-            <SectionSubtitle>총 {ownedToys.length}개의 캐릭터를 모았어요!</SectionSubtitle>
-          </SectionHeader>
-          
-          {ownedToysData.length > 0 ? (
-            <CollectionGrid>
-              <FlatList
-                data={ownedToysData}
-                renderItem={renderOwnedItem}
-                keyExtractor={item => item.id}
-                numColumns={3}
-                scrollEnabled={false}
-                ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-              />
-            </CollectionGrid>
-          ) : (
-            <EmptyState>
-              <EmptyStateText>아직 모은 캐릭터가 없어요.{'\n'}캐릭터를 모아 도감을 완성해보세요!</EmptyStateText>
-            </EmptyState>
-          )}
-        </Section>
-
-        {/* 추천 시리즈 */}
-        {recommendedSeries.length > 0 && (
-          <Section>
-            <SectionHeader>
-              <SectionTitle>이 시리즈를 완성해보세요!</SectionTitle>
-              <SectionSubtitle>조금만 더 모으면 시리즈를 완성할 수 있어요</SectionSubtitle>
-            </SectionHeader>
-            
-            {recommendedSeries.map(series => {
-              const ownedCount = series.toys.filter(toy => ownedToys.includes(toy.id)).length;
-              return (
-                <SeriesCard key={series.name}>
-                  <SeriesImage source={{ uri: series.firstToyImage }} />
-                  <SeriesInfo>
-                    <SeriesName>{series.nameKo}</SeriesName>
-                    <SeriesDescription>
-                      {ownedCount}/{series.toys.length}개 보유중
-                    </SeriesDescription>
-                    <SeriesCount>
-                      {series.toys.length - ownedCount}개만 더 모으면 완성!
-                    </SeriesCount>
-                  </SeriesInfo>
-                </SeriesCard>
-              );
-            })}
-          </Section>
-        )}
-      </ScrollView>
+      {ownedToysData.length > 0 ? (
+        <FlatList
+          data={ownedToysData}
+          renderItem={renderOwnedItem}
+          keyExtractor={item => item.id}
+          numColumns={3}
+          ListHeaderComponent={ListHeader}
+          ListFooterComponent={ListFooter}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+          columnWrapperStyle={{ paddingHorizontal: 10 }}
+        />
+      ) : (
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <ListHeader />
+          <EmptyState>
+            <EmptyStateText>아직 모은 캐릭터가 없어요.{'\n'}캐릭터를 모아 도감을 완성해보세요!</EmptyStateText>
+          </EmptyState>
+          <ListFooter />
+        </ScrollView>
+      )}
     </Container>
   );
 };

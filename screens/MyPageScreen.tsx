@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
-import { SafeAreaView, StatusBar, ScrollView, ActivityIndicator, Linking } from 'react-native';
+import { SafeAreaView, StatusBar, ScrollView, ActivityIndicator, Linking, View } from 'react-native';
 import ApiService, { User } from '../utils/api';
 import AsyncStorage from '../utils/storage';
 import { toysData } from '../utils/toysData';
@@ -118,7 +118,7 @@ const TestResultCharacter = styled.Text`
 const StatsContainer = styled.View`
   flex-direction: row;
   margin-top: 24px;
-  gap: 12px;
+  gap: 20px;
 `;
 
 const StatButton = styled.TouchableOpacity`
@@ -206,26 +206,48 @@ const LinkIcon = styled.Image`
   height: 20px;
 `;
 
-const AddButton = styled.TouchableOpacity`
-  background-color: #ff4757;
-  width: 56px;
-  height: 56px;
-  border-radius: 28px;
-  align-items: center;
+const OwnedGrid = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 16px;
   justify-content: center;
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  shadow-color: #000;
-  shadow-offset: 0px 2px;
-  shadow-opacity: 0.25;
-  shadow-radius: 4px;
-  elevation: 5;
 `;
 
-const AddButtonText = styled.Text`
-  color: white;
-  font-size: 28px;
+const OwnedItem = styled.TouchableOpacity`
+  width: 112px;
+  height: 112px;
+  margin: 6px;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: white;
+  shadow-color: #000;
+  shadow-offset: 0px 1px;
+  shadow-opacity: 0.05;
+  shadow-radius: 2px;
+  elevation: 2;
+`;
+
+const OwnedItemImage = styled.Image`
+  width: 100%;
+  height: 100%;
+`;
+
+const AddItemButton = styled.TouchableOpacity`
+  width: 112px;
+  height: 112px;
+  margin: 6px;
+  border-radius: 12px;
+  background-color: #f8f9fa;
+  align-items: center;
+  justify-content: center;
+  border-width: 2px;
+  border-color: #e9ecef;
+  border-style: dashed;
+`;
+
+const AddItemText = styled.Text`
+  color: #adb5bd;
+  font-size: 36px;
   font-weight: 300;
 `;
 
@@ -235,7 +257,7 @@ const ProfileScreen = () => {
   const [testResult, setTestResult] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [favoriteToyIds, setFavoriteToyIds] = useState<string[]>([]);
-  const [ownedToyIds] = useState<string[]>(['molly-castle', 'dimoo-world', 'bearbrick-400', 'molang-sweet']);
+  const [ownedToyIds, setOwnedToyIds] = useState<string[]>([]);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -318,6 +340,7 @@ const ProfileScreen = () => {
           >
             <StatText active={activeTab === 'favorites'}>찜 {favoriteToyIds.length}</StatText>
           </StatButton>
+          <View style={{ width: 10 }} />
           <StatButton 
             active={activeTab === 'owned'}
             onPress={() => setActiveTab('owned')}
@@ -368,36 +391,25 @@ const ProfileScreen = () => {
               )}
             </>
           ) : (
-            <>
+            <OwnedGrid>
               {ownedToyIds.map(toyId => {
                 const toy = toysData.find(t => t.id === toyId);
                 if (!toy) return null;
                 return (
-                  <ItemCard key={toy.id}>
-                    <ItemIcon source={{ uri: toy.imageUrl }} />
-                    <ItemContent>
-                      <ItemTitle>{toy.nameKo}</ItemTitle>
-                      <ItemDescription>{toy.seriesKo}</ItemDescription>
-                      <ItemDescription>{toy.description}</ItemDescription>
-                      <ItemFooter>
-                        <ActionButton onPress={() => Linking.openURL(toy.popmartUrl)}>
-                          <LinkIcon source={require('../assets/link.png')} />
-                        </ActionButton>
-                      </ItemFooter>
-                    </ItemContent>
-                  </ItemCard>
+                  <OwnedItem key={toy.id} onPress={() => Linking.openURL(toy.popmartUrl)}>
+                    <OwnedItemImage source={{ uri: toy.imageUrl }} />
+                  </OwnedItem>
                 );
               })}
-            </>
+              {ownedToyIds.length === 0 && (
+                <AddItemButton onPress={() => navigation.navigate('HomeTab' as never)}>
+                  <AddItemText>+</AddItemText>
+                </AddItemButton>
+              )}
+            </OwnedGrid>
           )}
         </ScrollView>
       </ContentSection>
-      
-      {activeTab === 'owned' && (
-        <AddButton onPress={() => navigation.navigate('HomeTab' as never)}>
-          <AddButtonText>+</AddButtonText>
-        </AddButton>
-      )}
       </Container>
     </SafeAreaView>
   );

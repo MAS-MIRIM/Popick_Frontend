@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import { SafeAreaView, StatusBar, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { SafeAreaView, StatusBar, ScrollView, TouchableOpacity, Image, View, ActivityIndicator } from 'react-native';
 import { PersonalityTestResult, personalityTestCharacters } from '../utils/personalityTestData';
 import { useNavigation } from '@react-navigation/native';
 
@@ -36,10 +36,11 @@ const CharacterImage = styled.Image`
   width: 250px;
   height: 250px;
   border-radius: 20px;
-  margin-bottom: 20px;
+  background-color: #f0f0f0;
 `;
 
 const CharacterName = styled.Text`
+  margin-top: 20px;
   font-size: 28px;
   font-weight: bold;
   color: #ef4444;
@@ -169,6 +170,8 @@ interface Props {
 
 const PersonalityTestResultScreen: React.FC<Props> = ({ result, onRetake }) => {
   const navigation = useNavigation();
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
 
   const sortedScores = Object.entries(result.scores)
     .sort(([, a], [, b]) => b - a)
@@ -196,11 +199,43 @@ const PersonalityTestResultScreen: React.FC<Props> = ({ result, onRetake }) => {
         </Header>
 
         <CharacterSection>
-          {result.character.imageUrl ? (
-            <CharacterImage source={{ uri: result.character.imageUrl }} />
-          ) : (
-            <CharacterImage source={require('../assets/placeholder.png')} />
-          )}
+          <View style={{ position: 'relative', width: 250, height: 250 }}>
+            {imageLoading && !imageError && (
+              <View style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#f0f0f0',
+                borderRadius: 20,
+              }}>
+                <ActivityIndicator size="large" color="#ef4444" />
+              </View>
+            )}
+            {!imageError && result.character.imageUrl ? (
+              <CharacterImage 
+                source={{ 
+                  uri: result.character.imageUrl.replace('http://', 'https://'),
+                  cache: 'reload'
+                }}
+                resizeMode="contain"
+                onLoadStart={() => setImageLoading(true)}
+                onLoadEnd={() => setImageLoading(false)}
+                onError={(e) => {
+                  console.log('[PersonalityTestResult] Image load error:', e.nativeEvent.error);
+                  console.log('[PersonalityTestResult] Failed URL:', result.character.imageUrl);
+                  console.log('[PersonalityTestResult] Tried URL:', result.character.imageUrl.replace('http://', 'https://'));
+                  setImageError(true);
+                  setImageLoading(false);
+                }}
+              />
+            ) : (
+              <CharacterImage source={require('../assets/placeholder.png')} />
+            )}
+          </View>
           
           <CharacterName>{result.character.nameKo}</CharacterName>
           

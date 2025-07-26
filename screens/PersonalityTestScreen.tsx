@@ -127,6 +127,9 @@ const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
         answers: finalAnswers
       });
       
+      console.log('[PersonalityTest] Result from backend:', result);
+      console.log('[PersonalityTest] Character imageUrl:', result.character?.imageUrl);
+      
       // Save result to AsyncStorage
       await AsyncStorage.setItem('personalityTestResult', JSON.stringify(result));
       await AsyncStorage.setItem('hasCompletedPersonalityTest', 'true');
