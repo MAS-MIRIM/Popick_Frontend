@@ -49,27 +49,39 @@ const ProfileImageContainer = styled.View`
 const ProfileImage = styled.View`
   width: 80px;
   height: 80px;
-  background-color: #d1d5db;
+  background-color: #e5e7eb;
   border-radius: 40px;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 `;
 
-const EditBadge = styled.View`
-  position: absolute;
-  bottom: 0;
-  right: 0;
+const ProfileIcon = styled.View`
+  position: relative;
+  width: 60px;
+  height: 60px;
+  align-items: center;
+`;
+
+const ProfileHead = styled.View`
   width: 24px;
   height: 24px;
-  background-color: #ef4444;
+  background-color: #9ca3af;
   border-radius: 12px;
-  align-items: center;
-  justify-content: center;
+  position: absolute;
+  top: 0;
 `;
 
-const EditBadgeText = styled.Text`
-  color: white;
-  font-size: 12px;
+const ProfileBody = styled.View`
+  width: 40px;
+  height: 30px;
+  background-color: #9ca3af;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  position: absolute;
+  bottom: 0;
 `;
 
 const ProfileDetails = styled.View`
@@ -97,6 +109,7 @@ const UserNickname = styled.Text`
 const TestResultCharacter = styled.Text`
   color: #6b7280;
   font-size: 14px;
+  margin-top: 4px;
 `;
 
 const StatsContainer = styled.View`
@@ -205,9 +218,12 @@ const ProfileScreen = () => {
       
       // 테스트 결과 가져오기 (AsyncStorage에서)
       const savedResult = await AsyncStorage.getItem('personalityTestResult');
+      console.log('[MyPage] Saved result:', savedResult);
       if (savedResult) {
         const result = JSON.parse(savedResult);
-        setTestResult(result.character?.name || '');
+        console.log('[MyPage] Parsed result:', result);
+        console.log('[MyPage] Character:', result.character);
+        setTestResult(result.character?.nameKo || result.character?.name || '');
       }
     } catch (error) {
       console.error('Failed to load profile:', error);
@@ -237,11 +253,11 @@ const ProfileScreen = () => {
         <ProfileInfo>
           <ProfileImageContainer>
             <ProfileImage>
-              {/* 프로필 이미지 */}
+              <ProfileIcon>
+                <ProfileHead />
+                <ProfileBody />
+              </ProfileIcon>
             </ProfileImage>
-            <EditBadge>
-              <EditBadgeText>✏</EditBadgeText>
-            </EditBadge>
           </ProfileImageContainer>
           
           <ProfileDetails>

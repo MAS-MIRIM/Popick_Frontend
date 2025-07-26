@@ -91,7 +91,6 @@ const TraitText = styled.Text`
 
 const ScoresSection = styled.View`
   padding: 20px;
-  background-color: #f9fafb;
 `;
 
 const ScoresTitle = styled.Text`
@@ -241,9 +240,6 @@ const PersonalityTestResultScreen: React.FC<Props> = ({ result, onRetake }) => {
           <PrimaryButton onPress={handleGoHome}>
             <ButtonText primary>홈으로 가기</ButtonText>
           </PrimaryButton>
-          <SecondaryButton onPress={handleRetake}>
-            <ButtonText>다시 테스트하기</ButtonText>
-          </SecondaryButton>
         </ButtonContainer>
       </ScrollView>
     </Container>
