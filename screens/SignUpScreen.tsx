@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import styled from 'styled-components/native';
 import {Alert} from 'react-native';
+import ApiService from '../utils/api';
 
 type SignUpScreenProps = {
   onSignUpSuccess: () => void;
@@ -12,8 +13,7 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  // const [nickname, setNickname] = useState('');
-  // const [birthDate, setBirthDate] = useState('');
+  const [nickname, setNickname] = useState('');
 
   const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
@@ -29,16 +29,15 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
       return;
     }
 
-    // 실제로는 서버 API 호출
-    // 여기서는 간단히 시뮬레이션
-    if (userId === 'testuser' || userId === 'admin') {
-      setIdError('이미 사용중인 아이디입니다.');
+    // 아이디 형식 체크만 진행 (중복확인은 회원가입 시점에)
+    if (userId.length < 2) {
+      setIdError('아이디는 2자 이상이어야 합니다.');
       setIsIdValid(false);
     } else {
       setIdError('');
       setIsIdValid(true);
       setIsIdChecked(true);
-      Alert.alert('확인', '사용 가능한 아이디입니다.');
+      Alert.alert('확인', '사용 가능한 아이디 형식입니다.');
     }
   };
 
@@ -93,7 +92,7 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
     );
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep === 1) {
       if (!userId.trim()) {
         setIdError('아이디를 입력해주세요.');
@@ -108,11 +107,33 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
       }
     } else if (currentStep === 2) {
       if (isPasswordValid()) {
-        Alert.alert('회원가입 성공!', '로그인 페이지로 넘어갑니다.');
-        onSignUpSuccess();
+        setCurrentStep(3);
+      }
+    } else if (currentStep === 3) {
+      if (nickname.trim().length > 0) {
+        try {
+          const response = await ApiService.register(userId, password, nickname);
+          
+          // 회원가입 성공 후 자동 로그인
+          await ApiService.login(userId, password);
+          
+          Alert.alert('회원가입 성공!', `${nickname}님 환영합니다!`);
+          onSignUpSuccess();
+        } catch (error: any) {
+          if (error.statusCode === 409) {
+            Alert.alert('회원가입 실패', '이미 사용중인 아이디입니다.');
+            setCurrentStep(1);
+            setIsIdChecked(false);
+            setIsIdValid(false);
+          } else if (error.statusCode === 400) {
+            const message = Array.isArray(error.message) ? error.message.join('\n') : error.message;
+            Alert.alert('회원가입 실패', message);
+          } else {
+            Alert.alert('오류', '회원가입 중 문제가 발생했습니다.');
+          }
+        }
       }
     }
-    // 다른 단계들은 추후 구현하시긔
   };
 
   const renderStepContent = () => {
@@ -188,6 +209,23 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
             </InputContainer>
           </>
         );
+      case 3:
+        return (
+          <>
+            <StepTitle>오픽에서 사용하실{'\n'}닉네임을 입력해주세요.</StepTitle>
+            <InputContainer>
+              <InputWrapper>
+                <StyledInput
+                  value={nickname}
+                  onChangeText={setNickname}
+                  placeholder="닉네임을 입력해주세요."
+                  placeholderTextColor="#A7A7A7"
+                  secureTextEntry={false}
+                />
+              </InputWrapper>
+            </InputContainer>
+          </>
+        );
       default:
         return null;
     }
@@ -197,7 +235,7 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
     <Container>
       <ProgressBarContainer>
         <ProgressBar>
-          <ProgressFill width={(currentStep / 4) * 100} />
+          <ProgressFill width={(currentStep / 3) * 100} />
         </ProgressBar>
       </ProgressBarContainer>
 
@@ -210,6 +248,8 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
               ? isIdValid
               : currentStep === 2
               ? isPasswordValid()
+              : currentStep === 3
+              ? nickname.trim().length > 0
               : false
           }
           onPress={handleNext}
@@ -218,9 +258,11 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
               ? !isIdValid
               : currentStep === 2
               ? !isPasswordValid()
+              : currentStep === 3
+              ? nickname.trim().length === 0
               : false
           }>
-          <NextButtonText>다음으로</NextButtonText>
+          <NextButtonText>{currentStep === 3 ? '완료' : '다음으로'}</NextButtonText>
         </NextButton>
         
         <LoginContainer>
@@ -255,7 +297,7 @@ const ProgressBar = styled.View`
 const ProgressFill = styled.View<{width: number}>`
   height: 100%;
   width: ${props => props.width}%;
-  background-color: #E50120;
+  background-color: #F63F4E;
   border-radius: 3px;
 `;
 
@@ -272,7 +314,7 @@ const StepTitle = styled.Text`
 `;
 
 const InputContainer = styled.View`
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 `;
 
 const InputWrapper = styled.View<{hasError?: boolean}>`
@@ -289,7 +331,7 @@ const StyledInput = styled.TextInput`
 `;
 
 const DuplicateCheckButton = styled.TouchableOpacity`
-  border: #E50120;
+  border: #F63F4E;
   padding: 8px 16px;
   margin-right: 8px;
   border-radius: 20px;
@@ -298,7 +340,7 @@ const DuplicateCheckButton = styled.TouchableOpacity`
 `;
 
 const DuplicateCheckText = styled.Text`
-  color: #E50120;
+  color: #F63F4E;
   font-weight: 600;
   font-size: 13px;
 `;
@@ -333,7 +375,7 @@ const EyeIcon = styled.Image`
 const NextButton = styled.TouchableOpacity<{isActive: boolean}>`
   width: 90%;
   padding: 15px;
-  background-color: ${props => (props.isActive ? '#E50120' : '#A8A8A8')};
+  background-color: ${props => (props.isActive ? '#F63F4E' : '#A8A8A8')};
   border-radius: 8px;
   align-items: center;
   align-self: center;
@@ -363,7 +405,7 @@ const LoginLink = styled.TouchableOpacity``;
 
 const LoginLinkText = styled.Text`
   font-size: 14px;
-  color: #E50120;
+  color: #F63F4E;
   font-weight: 600;
   text-decoration-line: underline;
 `;

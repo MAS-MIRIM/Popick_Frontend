@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import styled from 'styled-components/native';
 import {Alert} from 'react-native';
+import ApiService from '../utils/api';
 
 type LoginScreenProps = {
   onLoginSuccess: () => void;
@@ -19,7 +20,7 @@ const LoginScreen = ({onLoginSuccess, onSignUpPress}: LoginScreenProps) => {
     return userId.trim().length > 0 && password.trim().length > 0;
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!userId.trim()) {
       setIdError('아이디를 입력해주세요.');
       return;
@@ -29,9 +30,17 @@ const LoginScreen = ({onLoginSuccess, onSignUpPress}: LoginScreenProps) => {
       return;
     }
     
-    // 실제로는 서버 API 호출
-    Alert.alert('로그인 성공', `${userId}님 환영합니다!`);
-    onLoginSuccess();
+    try {
+      const response = await ApiService.login(userId, password);
+      Alert.alert('로그인 성공', `${response.user.nickname}님 환영합니다!`);
+      onLoginSuccess();
+    } catch (error: any) {
+      if (error.statusCode === 401) {
+        Alert.alert('로그인 실패', '아이디 또는 비밀번호가 잘못되었습니다.');
+      } else {
+        Alert.alert('오류', '로그인 중 문제가 발생했습니다.');
+      }
+    }
   };
 
   const handleIdChange = (text: string) => {
@@ -46,11 +55,7 @@ const LoginScreen = ({onLoginSuccess, onSignUpPress}: LoginScreenProps) => {
 
   return (
     <Container>
-      <ProgressBarContainer>
-        <ProgressBar>
-          <ProgressFill width={100} />
-        </ProgressBar>
-      </ProgressBarContainer>
+      <Spacer />
       
       <ContentContainer>
         <StepTitle>오픽에서 사용했던{'\n'}정보를 입력해주세요.</StepTitle>
@@ -120,24 +125,8 @@ const Container = styled.View`
 `;
 
 
-const ProgressBarContainer = styled.View`
-  align-items: center;
-  margin-top: 20%;
-  margin-bottom: 10%;
-`;
-
-const ProgressBar = styled.View`
-  height: 6px;
-  width: 344px;
-  background-color: #e8e8e8;
-  border-radius: 3px;
-`;
-
-const ProgressFill = styled.View<{width: number}>`
-  height: 100%;
-  width: ${props => props.width}%;
-  background-color: #E50120;
-  border-radius: 3px;
+const Spacer = styled.View`
+  height: 15%;
 `;
 
 const ContentContainer = styled.View`
@@ -153,7 +142,7 @@ const StepTitle = styled.Text`
 `;
 
 const InputContainer = styled.View`
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 `;
 
 const InputWrapper = styled.View<{hasError?: boolean}>`
@@ -199,7 +188,7 @@ const ErrorText = styled.Text`
 const NextButton = styled.TouchableOpacity<{isActive: boolean}>`
   width: 90%;
   padding: 15px;
-  background-color: ${props => (props.isActive ? '#E50120' : '#A8A8A8')};
+  background-color: ${props => (props.isActive ? '#F63F4E' : '#A8A8A8')};
   border-radius: 8px;
   align-items: center;
   align-self: center;
@@ -229,7 +218,7 @@ const SignUpLink = styled.TouchableOpacity``;
 
 const SignUpLinkText = styled.Text`
   font-size: 14px;
-  color: #E50120;
+  color: #F63F4E;
   font-weight: 600;
   text-decoration-line: underline;
 `;

@@ -2,6 +2,9 @@
 import 'react-native-gesture-handler/jestSetup';
 import '@testing-library/jest-native/extend-expect';
 
+// Mock fetch for tests
+global.fetch = jest.fn();
+
 // Mock react-native modules
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
