@@ -1,10 +1,11 @@
 import React from 'react';
 import styled from 'styled-components/native';
 
-const HomeScreen = () => {
+const DogamScreen = () => {
   return (
     <Container>
-      <Text>홈 화면입니다!</Text>
+      <Title>도감</Title>
+      <SubText>도감 화면입니다</SubText>
     </Container>
   );
 };
@@ -16,9 +17,16 @@ const Container = styled.View`
   align-items: center;
 `;
 
-const Text = styled.Text`
+const Title = styled.Text`
   font-size: 24px;
   font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
 `;
 
-export default HomeScreen;
+const SubText = styled.Text`
+  font-size: 16px;
+  color: #666;
+`;
+
+export default DogamScreen;

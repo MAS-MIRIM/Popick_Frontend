@@ -8,7 +8,7 @@ import {ActivityIndicator, View} from 'react-native';
 import Welcome from './screens/Welcome';
 import LoginScreen from './screens/LoginScreen';
 import SignUpScreen from './screens/SignUpScreen';
-import HomeScreen from './screens/HomeScreen';
+import TabNavigator from './navigation/TabNavigator';
 import ApiService from './utils/api';
 import AsyncStorage from './utils/storage';
 
@@ -16,7 +16,7 @@ export type RootStackParamList = {
   Welcome: undefined;
   Login: undefined;
   SignUp: undefined;
-  Home: undefined;
+  MainTabs: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -88,7 +88,7 @@ const App = () => {
             </Stack.Screen>
           </>
         ) : (
-          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="MainTabs" component={TabNavigator} />
         )}
       </Stack.Navigator>
     </NavigationContainer>
