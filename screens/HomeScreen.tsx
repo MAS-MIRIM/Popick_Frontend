@@ -45,7 +45,7 @@ const IconImage = styled.Image`
 `;
 
 const MainBanner = styled.View`
-  height: 300px;
+  height: 315px;
   margin-bottom: 20px;
 `;
 
@@ -290,15 +290,16 @@ const CharacterShoppingApp = () => {
             ]}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <View style={{ width: screenWidth - 32, alignItems: 'center', justifyContent: 'center' }}>
-                <Image 
-                  source={item.image} 
-                  style={{ width: 332, height: 292, borderRadius: 12 }} 
-                />
-                <Text style={{
-                  position: 'absolute',
-                  bottom: 20,
-                  left: 20,
+              <View style={{ width: screenWidth - 32, alignItems: 'center', justifyContent: 'center', padding: 10 }}>
+                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                  <Image 
+                    source={item.image} 
+                    style={{ width: 348, height: 306, borderRadius: 12 }} 
+                  />
+                  <Text style={{
+                    position: 'absolute',
+                    bottom: 30,
+                    left: 30,
                   color: 'white',
                   fontSize: 24,
                   fontWeight: 'bold',
@@ -308,6 +309,7 @@ const CharacterShoppingApp = () => {
                 }}>
                   {item.title}
                 </Text>
+                </View>
               </View>
             )}
             onScroll={(event) => {

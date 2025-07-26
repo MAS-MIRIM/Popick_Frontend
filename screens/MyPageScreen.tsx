@@ -1,29 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { SafeAreaView, StatusBar, ScrollView } from 'react-native';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
-  background-color: #f9fafb;
+  background-color: #F1F1F1;
 `;
 
 const Header = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  background-color: white;
-  border-bottom-width: 1px;
-  border-bottom-color: #e5e7eb;
-`;
-
-const BackButton = styled.TouchableOpacity`
-  padding: 4px;
+  padding: 20px 36px;
 `;
 
 const HeaderTitle = styled.Text`
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 900;
 `;
 
 const HeaderSpacer = styled.View`
@@ -31,9 +24,16 @@ const HeaderSpacer = styled.View`
 `;
 
 const ProfileSection = styled.View`
+  padding: 20px 36px 24px 36px;
+  background-color: #F1F1F1;
+`;
+
+const ContentSection = styled.View`
+  flex: 1;
   background-color: white;
-  padding: 24px 16px;
-  margin-bottom: 8px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding-top: 16px;
 `;
 
 const ProfileInfo = styled.View`
@@ -109,9 +109,11 @@ const StatText = styled.Text`
 `;
 
 const SectionTitle = styled.Text`
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
-  margin: 16px 16px 12px 16px;
+  text-align: center;
+  margin: 0 0 12px 0;
+  padding-top: 16px;
 `;
 
 const ItemCard = styled.TouchableOpacity`
@@ -172,41 +174,13 @@ const ActionIcon = styled.View`
   height: 20px;
 `;
 
-const BottomNavigation = styled.View`
-  flex-direction: row;
-  background-color: white;
-  border-top-width: 1px;
-  border-top-color: #e5e7eb;
-  padding-top: 8px;
-  padding-bottom: 20px;
-`;
-
-const NavItem = styled.TouchableOpacity`
-  flex: 1;
-  align-items: center;
-  padding: 8px 0;
-`;
-
-const NavIcon = styled.View`
-  width: 24px;
-  height: 24px;
-  margin-bottom: 4px;
-`;
-
-const NavText = styled.Text`
-  font-size: 12px;
-  color: ${props => props.active ? '#ef4444' : '#6b7280'};
-`;
-
 const ProfileScreen = () => {
+  const [activeTab, setActiveTab] = useState<'favorites' | 'owned'>('favorites');
+
   return (
     <Container>
       <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
-      
       <Header>
-        <BackButton>
-          {/* 뒤로가기 아이콘 */}
-        </BackButton>
         <HeaderTitle>내 프로필</HeaderTitle>
         <HeaderSpacer />
       </Header>
@@ -230,92 +204,117 @@ const ProfileScreen = () => {
           </ProfileInfo>
 
           <StatsContainer>
-            <StatButton active>
-              <StatText active>찜 14</StatText>
+            <StatButton 
+              active={activeTab === 'favorites'} 
+              onPress={() => setActiveTab('favorites')}
+            >
+              <StatText active={activeTab === 'favorites'}>찜 14</StatText>
             </StatButton>
-            <StatButton>
-              <StatText>소유 캐릭터 7</StatText>
+            <StatButton 
+              active={activeTab === 'owned'}
+              onPress={() => setActiveTab('owned')}
+            >
+              <StatText active={activeTab === 'owned'}>소유 캐릭터 7</StatText>
             </StatButton>
           </StatsContainer>
         </ProfileSection>
 
-        <SectionTitle>찜 목록</SectionTitle>
+        <ContentSection>
+          <SectionTitle>{activeTab === 'favorites' ? '찜 목록' : '소유 캐릭터'}</SectionTitle>
 
-        <ItemCard>
-          <ItemHeader>
-            <ItemIcon>
-              {/* 크라이베이비 아이콘 이미지 */}
-            </ItemIcon>
-            <ItemContent>
-              <ItemTitle>크라이베이비</ItemTitle>
-              <ItemDescription>멜프레시오니즘 시리즈{'\n'}플러시 봄 머쉰</ItemDescription>
-            </ItemContent>
-          </ItemHeader>
-          <ItemFooter>
-            <ActionButton>
-              <ActionIcon>
-                {/* 하트 아이콘 */}
-              </ActionIcon>
-            </ActionButton>
-            <ActionButton>
-              <ActionIcon>
-                {/* 공유 아이콘 */}
-              </ActionIcon>
-            </ActionButton>
-          </ItemFooter>
-        </ItemCard>
+          {activeTab === 'favorites' ? (
+            <>
+              <ItemCard>
+                <ItemHeader>
+                  <ItemIcon>
+                    {/* 크라이베이비 아이콘 이미지 */}
+                  </ItemIcon>
+                  <ItemContent>
+                    <ItemTitle>크라이베이비</ItemTitle>
+                    <ItemDescription>멜프레시오니즘 시리즈{'\n'}플러시 봄 머쉰</ItemDescription>
+                  </ItemContent>
+                </ItemHeader>
+                <ItemFooter>
+                  <ActionButton>
+                    <ActionIcon>
+                      {/* 하트 아이콘 */}
+                    </ActionIcon>
+                  </ActionButton>
+                  <ActionButton>
+                    <ActionIcon>
+                      {/* 공유 아이콘 */}
+                    </ActionIcon>
+                  </ActionButton>
+                </ItemFooter>
+              </ItemCard>
 
-        <ItemCard>
-          <ItemHeader>
-            <ItemIcon>
-              {/* 라부부 아이콘 이미지 */}
-            </ItemIcon>
-            <ItemContent>
-              <ItemTitle>라부부</ItemTitle>
-              <ItemDescription>더 몬스터즈 하이레이트{'\n'}시리즈 사랑 커플</ItemDescription>
-            </ItemContent>
-          </ItemHeader>
-          <ItemFooter>
-            <ActionButton>
-              <ActionIcon>
-                {/* 하트 아이콘 */}
-              </ActionIcon>
-            </ActionButton>
-            <ActionButton>
-              <ActionIcon>
-                {/* 공유 아이콘 */}
-              </ActionIcon>
-            </ActionButton>
-          </ItemFooter>
-        </ItemCard>
+              <ItemCard>
+                <ItemHeader>
+                  <ItemIcon>
+                    {/* 라부부 아이콘 이미지 */}
+                  </ItemIcon>
+                  <ItemContent>
+                    <ItemTitle>라부부</ItemTitle>
+                    <ItemDescription>더 몬스터즈 하이레이트{'\n'}시리즈 사랑 커플</ItemDescription>
+                  </ItemContent>
+                </ItemHeader>
+                <ItemFooter>
+                  <ActionButton>
+                    <ActionIcon>
+                      {/* 하트 아이콘 */}
+                    </ActionIcon>
+                  </ActionButton>
+                  <ActionButton>
+                    <ActionIcon>
+                      {/* 공유 아이콘 */}
+                    </ActionIcon>
+                  </ActionButton>
+                </ItemFooter>
+              </ItemCard>
+            </>
+          ) : (
+            <>
+              <ItemCard>
+                <ItemHeader>
+                  <ItemIcon>
+                    {/* 소유 캐릭터 아이콘 */}
+                  </ItemIcon>
+                  <ItemContent>
+                    <ItemTitle>몰랑이</ItemTitle>
+                    <ItemDescription>귀여운 토끼 캐릭터{'\n'}한정판 피규어</ItemDescription>
+                  </ItemContent>
+                </ItemHeader>
+                <ItemFooter>
+                  <ActionButton>
+                    <ActionIcon>
+                      {/* 공유 아이콘 */}
+                    </ActionIcon>
+                  </ActionButton>
+                </ItemFooter>
+              </ItemCard>
+
+              <ItemCard>
+                <ItemHeader>
+                  <ItemIcon>
+                    {/* 소유 캐릭터 아이콘 */}
+                  </ItemIcon>
+                  <ItemContent>
+                    <ItemTitle>베어브릭</ItemTitle>
+                    <ItemDescription>400% 사이즈{'\n'}리미티드 에디션</ItemDescription>
+                  </ItemContent>
+                </ItemHeader>
+                <ItemFooter>
+                  <ActionButton>
+                    <ActionIcon>
+                      {/* 공유 아이콘 */}
+                    </ActionIcon>
+                  </ActionButton>
+                </ItemFooter>
+              </ItemCard>
+            </>
+          )}
+        </ContentSection>
       </ScrollView>
-
-      <BottomNavigation>
-        <NavItem>
-          <NavIcon>
-            {/* 홈 아이콘 */}
-          </NavIcon>
-          <NavText>홈</NavText>
-        </NavItem>
-        <NavItem>
-          <NavIcon>
-            {/* 쇼핑 아이콘 */}
-          </NavIcon>
-          <NavText>쇼핑</NavText>
-        </NavItem>
-        <NavItem>
-          <NavIcon>
-            {/* 도감 아이콘 */}
-          </NavIcon>
-          <NavText>도감</NavText>
-        </NavItem>
-        <NavItem>
-          <NavIcon>
-            {/* 마이페이지 아이콘 */}
-          </NavIcon>
-          <NavText active>마이페이지</NavText>
-        </NavItem>
-      </BottomNavigation>
     </Container>
   );
 };
