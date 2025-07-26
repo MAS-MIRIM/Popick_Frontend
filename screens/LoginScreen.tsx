@@ -32,7 +32,6 @@ const LoginScreen = ({onLoginSuccess, onSignUpPress}: LoginScreenProps) => {
     
     try {
       const response = await ApiService.login(userId, password);
-      Alert.alert('로그인 성공', `${response.user.nickname}님 환영합니다!`);
       onLoginSuccess();
     } catch (error: any) {
       if (error.statusCode === 401) {

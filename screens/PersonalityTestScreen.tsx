@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
-import { ImageBackground, Alert, ActivityIndicator } from 'react-native';
+import { ImageBackground, Alert, ActivityIndicator, Image } from 'react-native';
 import ApiService from '../utils/api';
 
 interface Question {
@@ -105,9 +105,10 @@ const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
           <OptionsContainer>
             <OptionButton 
               selected={selectedOption === 'A'}
+              isO={true}
               onPress={() => setSelectedOption('A')}
             >
-              <OptionCircle selected={selectedOption === 'A'}>
+              <OptionCircle selected={selectedOption === 'A'} isO={true}>
                 <OptionCircleText>O</OptionCircleText>
               </OptionCircle>
               <OptionText>{currentQuestion.optionA}</OptionText>
@@ -115,14 +116,20 @@ const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
             
             <OptionButton 
               selected={selectedOption === 'B'}
+              isO={false}
               onPress={() => setSelectedOption('B')}
             >
-              <OptionCircle selected={selectedOption === 'B'}>
+              <OptionCircle selected={selectedOption === 'B'} isO={false}>
                 <OptionCircleText>X</OptionCircleText>
               </OptionCircle>
               <OptionText>{currentQuestion.optionB}</OptionText>
             </OptionButton>
           </OptionsContainer>
+          
+          <HelpContainer>
+            <LightIcon source={require('../assets/light.png')} />
+            <HelpText>가장 유사한 답변을 골라주세요.</HelpText>
+          </HelpContainer>
         </QuestionContainer>
         
         <NextButton 
@@ -172,29 +179,29 @@ const QuestionText = styled.Text`
   font-weight: 600;
   color: #333;
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 40px;
 `;
 
 const OptionsContainer = styled.View`
   width: 100%;
 `;
 
-const OptionButton = styled.TouchableOpacity<{ selected: boolean }>`
+const OptionButton = styled.TouchableOpacity<{ selected: boolean; isO: boolean }>`
   flex-direction: row;
   align-items: center;
   padding: 20px;
   margin-bottom: 16px;
-  background-color: ${props => props.selected ? '#FFF0F1' : 'white'};
+  background-color: ${props => props.selected ? (props.isO ? '#E6F4FF' : '#FFF0F1') : 'white'};
   border-radius: 12px;
-  border-width: 2px;
-  border-color: ${props => props.selected ? '#F63F4E' : '#E5E5E5'};
+  border-width: 1px;
+  border-color: ${props => props.selected ? (props.isO ? '#3DC5FF' : '#F63F4E') : '#E5E5E5'};
 `;
 
-const OptionCircle = styled.View<{ selected: boolean }>`
+const OptionCircle = styled.View<{ selected: boolean; isO: boolean }>`
   width: 48px;
   height: 48px;
   border-radius: 24px;
-  background-color: ${props => props.selected ? '#F63F4E' : '#E5E5E5'};
+  background-color: ${props => props.selected ? (props.isO ? '#3DC5FF' : '#F63F4E') : '#E5E5E5'};
   justify-content: center;
   align-items: center;
   margin-right: 16px;
@@ -225,6 +232,23 @@ const NextButtonText = styled.Text`
   color: white;
   font-size: 18px;
   font-weight: 600;
+`;
+
+const HelpContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  margin-top: 20px;
+`;
+
+const LightIcon = styled.Image`
+  width: 12px;
+  height: 15px;
+  margin-right: 8px;
+`;
+
+const HelpText = styled.Text`
+  font-size: 14px;
+  color: #666;
 `;
 
 export default PersonalityTestScreen;

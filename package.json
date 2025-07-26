@@ -27,6 +27,7 @@
     "react-native-safe-area-context": "^5.5.2",
     "react-native-screens": "^3.15.0",
     "react-native-svg": "^15.12.0",
+    "react-native-webview": "^13.15.0",
     "styled-components": "^5.3.11",
     "yup": "^1.6.1"
   },
@@ -71,7 +72,7 @@
       "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/jest.transformer.js"
     },
     "transformIgnorePatterns": [
-      "node_modules/(?!(react-native|@react-native|react-native-screens|react-native-reanimated|react-native-gesture-handler|react-native-safe-area-context|@react-navigation|react-native-svg|styled-components)/)"
+      "node_modules/(?!(react-native|@react-native|react-native-screens|react-native-reanimated|react-native-gesture-handler|react-native-safe-area-context|@react-navigation|react-native-svg|styled-components|react-native-webview)/)"
     ],
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",

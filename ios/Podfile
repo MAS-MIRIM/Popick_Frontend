@@ -5,7 +5,19 @@ platform :ios, '12.4'
 install! 'cocoapods', :deterministic_uuids => false
 
 target 'uslashthon' do
-  config = use_native_modules!
+  # Temporarily comment out use_native_modules to add pods manually
+  # config = use_native_modules!
+  config = { :reactNativePath => "../node_modules/react-native" }
+  
+  # Manually add native module pods
+  pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
+  pod 'RNReanimated', :path => '../node_modules/react-native-reanimated'
+  pod 'RNScreens', :path => '../node_modules/react-native-screens'
+  pod 'react-native-safe-area-context', :path => '../node_modules/react-native-safe-area-context'
+  pod 'RNSVG', :path => '../node_modules/react-native-svg'
+  pod 'react-native-webview', :path => '../node_modules/react-native-webview'
+  pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-async-storage/async-storage'
+  pod 'RNGoogleSignin', :path => '../node_modules/@react-native-google-signin/google-signin'
 
   # Flags change depending on the env values.
   flags = get_default_flags()

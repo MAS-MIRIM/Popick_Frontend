@@ -270,6 +270,8 @@ PODS:
     - glog
   - react-native-safe-area-context (5.5.2):
     - React-Core
+  - react-native-webview (13.15.0):
+    - React-Core
   - React-perflogger (0.70.10)
   - React-RCTActionSheet (0.70.10):
     - React-Core/RCTActionSheetHeaders (= 0.70.10)
@@ -402,6 +404,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
+  - react-native-webview (from `../node_modules/react-native-webview`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -479,6 +482,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
+  react-native-webview:
+    :path: "../node_modules/react-native-webview"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -521,7 +526,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
-  boost: 860d55a5b3a007c528ccdafab3bc6f4883e07143
+  boost: 9fa78656d705f55b1220151d997e57e2a3f2cde0
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: 4d79ff044f28bf8ebf735074332e7a6c54e268f0
   FBReactNativeSpec: 944ea69e5efe4e94a63e0ceaf9bfdad6515aaf84
@@ -550,6 +555,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 2a1985769123b199c195a96f46478b35db139712
   React-logger: 7fbdc3576b2ed3834360c8ea3c1c2ec54ac3043a
   react-native-safe-area-context: 63c9a6def15e6f6377e59cea51566148a2774d62
+  react-native-webview: 10534eb99f8f6511a9ae30bba10bf25767247b4f
   React-perflogger: f86e85eb59151d09e9b44b8931f5c088e4f08bbc
   React-RCTActionSheet: cd3d76501a6069e164986b93f144be34b593955c
   React-RCTAnimation: 2d09db635202e5d6f66de596f5a6b38389fe76ec
@@ -570,6 +576,6 @@ SPEC CHECKSUMS:
   RNSVG: 3446469442ca54ddf210d2a1b7c2b6eaecaca2c3
   Yoga: 0518155cfbcc68c56223422f6a20a71b82e307d2
 
-PODFILE CHECKSUM: 0b2e895f700a91af97f47dedef415724952b7997
+PODFILE CHECKSUM: 207648fc6db94aa9615907eb85dda40503e969a9
 
 COCOAPODS: 1.16.2

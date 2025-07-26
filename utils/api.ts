@@ -31,6 +31,25 @@ export interface ErrorResponse {
   statusCode: number;
 }
 
+export interface YouTubeVideo {
+  id: string;
+  title: string;
+  thumbnail: string;
+  channelTitle: string;
+  publishedAt: string;
+  url: string;
+  duration: string;
+  viewCount: string;
+}
+
+export interface YouTubeShortsResponse {
+  videos: YouTubeVideo[];
+  hasMore: boolean;
+  currentPage: string;
+  totalResults: number;
+  elapsedTimeMs: number;
+}
+
 class ApiService {
   private static async getToken(): Promise<string | null> {
     try {
@@ -268,6 +287,51 @@ class ApiService {
       return data;
     } catch (error) {
       console.log('[API] POST exception:', error);
+      throw error;
+    }
+  }
+
+  static async getYouTubeShorts(search: string, userId: string, page: number = 1, limit: number = 5): Promise<YouTubeShortsResponse> {
+    try {
+      const token = await this.getToken();
+      const headers: any = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      console.log(`[API] Fetching YouTube shorts: search=${search}, page=${page}, limit=${limit}`);
+      
+      const response = await fetch(`${BASE_URL}/youtube/shorts?page=${page}&limit=${limit}`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ search, userId }),
+      });
+
+      const data = await response.json();
+      console.log('[API] YouTube shorts response:', {
+        status: response.status,
+        videosCount: data.videos?.length || 0,
+        hasMore: data.hasMore,
+        fullResponse: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        console.log('[API] YouTube shorts error:', data);
+        throw data;
+      }
+
+      // Check if we got a valid response structure
+      if (!data.videos || !Array.isArray(data.videos)) {
+        console.log('[API] Invalid response structure:', data);
+        throw new Error('Invalid response format from YouTube shorts API');
+      }
+
+      return data;
+    } catch (error) {
+      console.log('[API] YouTube shorts exception:', error);
       throw error;
     }
   }

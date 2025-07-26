@@ -116,8 +116,6 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
           
           // 회원가입 성공 후 자동 로그인
           await ApiService.login(userId, password);
-          
-          Alert.alert('회원가입 성공!', `${nickname}님 환영합니다!`);
           onSignUpSuccess();
         } catch (error: any) {
           if (error.statusCode === 409) {
