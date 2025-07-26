@@ -272,6 +272,7 @@ const ProfileScreen = () => {
     React.useCallback(() => {
       loadFavorites();
       loadOwnedCharacters();
+      loadCharacters(); // 캐릭터 데이터도 다시 로드
     }, [])
   );
 
@@ -282,8 +283,26 @@ const ProfileScreen = () => {
 
   const loadCharacters = async () => {
     try {
-      const data = await CharacterAPI.getCharacters();
-      setCharacters(data);
+      // ALL 캐릭터 데이터 로드 (홈화면과 동일한 방식)
+      const response = await fetch(`http://api.hjun.kr/hackathon/characters/`);
+      const data = await response.json();
+      
+      if (data.images && Array.isArray(data.images)) {
+        const allProducts = data.images.map((item: any, index: number) => ({
+          id: `${item.category}_${item.id || index}`,
+          name: item.parsedInfo?.koCharacter || item.characterInfo?.name || '',
+          nameKo: item.parsedInfo?.koItemName || item.title || '',
+          series: item.parsedInfo?.series || '',
+          seriesKo: item.parsedInfo?.koSeries || '',
+          description: item.characterInfo?.description || '',
+          imageUrl: item.url.startsWith('http') ? item.url : `https://${item.url}`,
+          popmartUrl: '#',
+          category: item.category
+        }));
+        
+        setCharacters(allProducts);
+        console.log('[MyPage] Loaded characters:', allProducts.length);
+      }
     } catch (error) {
       console.error('[MyPage] Error loading characters:', error);
     }

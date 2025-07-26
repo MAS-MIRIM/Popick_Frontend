@@ -12,6 +12,7 @@ import {
   Linking,
   Dimensions,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
@@ -66,15 +67,6 @@ const Dot = styled.View`
   border-radius: 4px;
   background-color: ${props => props.active ? '#ff4757' : '#dfe6e9'};
   margin: 0 4px;
-`;
-
-const SearchBar = styled.View`
-  margin: 0 8px 20px;
-  background-color: #ff4757;
-  border-radius: 25px;
-  flex-direction: row;
-  align-items: center;
-  padding: 12px 20px;
 `;
 
 const SearchInput = styled(TextInput)`
@@ -202,6 +194,7 @@ const CharacterShoppingApp = () => {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [likeCounts, setLikeCounts] = useState<{[key: string]: number}>({});
   const [characters, setCharacters] = useState<Character[]>([]);
+  const [tabProducts, setTabProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
@@ -210,28 +203,47 @@ const CharacterShoppingApp = () => {
     loadCharacters();
   }, []);
 
+  useEffect(() => {
+    if (activeTab !== 'ALL') {
+      loadTabProducts();
+    }
+  }, [activeTab]);
+
   const loadCharacters = async () => {
     try {
       setLoading(true);
-      // Clear cache and force refresh from backend
-      await CharacterAPI.clearCache();
-      const data = await CharacterAPI.getCharacters(true);
       
-      if (data && data.length > 0) {
-        setCharacters(data);
+      // ALL 탭일 때는 /characters/ API로 모든 상품 로드
+      const response = await fetch(`http://api.hjun.kr/hackathon/characters/`);
+      const data = await response.json();
+      
+      if (data.images && Array.isArray(data.images)) {
+        // API 응답에서 모든 상품 데이터를 Character 형식으로 변환
+        const allProducts = data.images.map((item: any, index: number) => ({
+          id: `${item.category}_${item.id || index}`,
+          name: item.parsedInfo?.koCharacter || item.characterInfo?.name || '',
+          nameKo: item.parsedInfo?.koItemName || item.title || '',
+          series: item.parsedInfo?.series || '',
+          seriesKo: item.parsedInfo?.koSeries || '',
+          description: item.characterInfo?.description || '',
+          imageUrl: item.url.startsWith('http') ? item.url : `https://${item.url}`,
+          popmartUrl: '#',
+          category: item.category
+        }));
         
-        // Initialize like counts for loaded characters
+        setCharacters(allProducts);
+        
+        // Initialize like counts
         const counts: {[key: string]: number} = {};
-        data.forEach(char => {
+        allProducts.forEach((char: any) => {
           counts[char.id] = Math.floor(Math.random() * 20 + 5);
         });
         setLikeCounts(counts);
-      } else {
-        console.log('[HomeScreen] No characters loaded');
-        setCharacters([]);
+        
+        console.log(`[HomeScreen] Loaded ${allProducts.length} products from ALL API`);
       }
     } catch (error) {
-      console.error('[HomeScreen] Error loading characters:', error);
+      console.error('[HomeScreen] Error loading all characters:', error);
       setCharacters([]);
     } finally {
       setLoading(false);
@@ -274,9 +286,9 @@ const CharacterShoppingApp = () => {
           console.log('[HomeScreen] Added character to dogam:', character.nameKo);
         }
         
-        alert(`${character.nameKo}를 소유 캐릭터에 추가했습니다!`);
+        Alert.alert('소유 캐릭터 추가', `${character.nameKo}를 소유 캐릭터에 추가했습니다!`);
       } else {
-        alert(`${character.nameKo}는 이미 소유한 캐릭터입니다.`);
+        Alert.alert('이미 소유한 캐릭터', `${character.nameKo}는 이미 소유한 캐릭터입니다.`);
       }
     } catch (error) {
       console.error('[HomeScreen] Error adding owned character:', error);
@@ -363,13 +375,57 @@ const CharacterShoppingApp = () => {
     }
   ];
 
-  const tabs = ['ALL', 'DIMOO', 'LABUBU', 'MOLLY', 'SKULLPANDA', 'KUBO', 'CRYBABY', 'HIRONO', 'PUCKY'];
+  const tabs = ['ALL', 'DIMU', 'RABUBU', 'MOLLY', 'SKULLPANDA', 'KUBO', 'CRYBABY', 'HACHI', 'POOKY', 'PINOJELLY', 'JIGGER'];
+
+  const loadTabProducts = async () => {
+    if (activeTab === 'ALL') return;
+    
+    try {
+      setLoading(true);
+      // 탭 이름에 따른 캐릭터 ID 매핑
+      const tabMapping: {[key: string]: string} = {
+        'DIMU': 'char-dimu',
+        'RABUBU': 'char-rabubu',
+        'MOLLY': 'char-molly',
+        'SKULLPANDA': 'char-skullpanda',
+        'KUBO': 'char-kubo',
+        'CRYBABY': 'char-crybaby',
+        'HACHI': 'char-hachi',
+        'POOKY': 'char-pooky',
+        'PINOJELLY': 'char-pinojelly',
+        'JIGGER': 'char-jigger'
+      };
+      const categoryId = tabMapping[activeTab] || `char-${activeTab.toLowerCase()}`;
+      const response = await fetch(`http://api.hjun.kr/hackathon/characters/${categoryId}`);
+      const data = await response.json();
+      
+      if (data.images && Array.isArray(data.images)) {
+        // API 응답에서 상품 데이터를 Character 형식으로 변환
+        const products = data.images.map((item: any) => ({
+          id: `${item.category}_${item.id}`,
+          name: item.parsedInfo?.koCharacter || item.characterInfo?.name || '',
+          nameKo: item.parsedInfo?.koItemName || item.title || '',
+          series: item.parsedInfo?.series || '',
+          seriesKo: item.parsedInfo?.koSeries || '',
+          description: item.characterInfo?.description || '',
+          imageUrl: item.url.startsWith('http') ? item.url : `https://${item.url}`,
+          popmartUrl: '#'
+        }));
+        setTabProducts(products);
+      }
+    } catch (error) {
+      console.error('[HomeScreen] Error loading tab products:', error);
+      setTabProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getFilteredProducts = () => {
     if (activeTab === 'ALL') {
       return characters;
     }
-    return characters.filter(char => char.name.toUpperCase() === activeTab);
+    return tabProducts;
   };
 
   const products = getFilteredProducts();
@@ -485,14 +541,6 @@ const CharacterShoppingApp = () => {
               <Dot active={currentBannerIndex === 0} />
               <Dot active={currentBannerIndex === 1} />
             </PageIndicator>
-
-            <SearchBar>
-              <SearchInput 
-                placeholder="검색"
-                placeholderTextColor="#fff"
-              />
-              <SearchIcon source={require('../assets/search.png')} />
-            </SearchBar>
 
             <TrendingSection>
               <SectionTitle>지금 뜨는 캐릭터</SectionTitle>
