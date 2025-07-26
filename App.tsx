@@ -11,12 +11,14 @@ import SignUpScreen from './screens/SignUpScreen';
 import TabNavigator from './navigation/TabNavigator';
 import ApiService from './utils/api';
 import AsyncStorage from './utils/storage';
+import PersonalityTestScreen from './screens/PersonalityTestScreen';
 
 export type RootStackParamList = {
   Welcome: undefined;
   Login: undefined;
   SignUp: undefined;
   MainTabs: undefined;
+  PersonalityTest: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -24,6 +26,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFirstLogin, setIsFirstLogin] = useState(false);
 
   useEffect(() => {
     checkAuthStatus();
@@ -40,6 +43,12 @@ const App = () => {
       const isAuth = await ApiService.checkAuth();
       console.log('[App] Auth check result:', isAuth);
       setIsAuthenticated(isAuth);
+      
+      // 첫 로그인 여부 확인
+      if (isAuth) {
+        const hasCompletedTest = await AsyncStorage.getItem('hasCompletedPersonalityTest');
+        setIsFirstLogin(!hasCompletedTest);
+      }
     } catch (error) {
       console.error('[App] Auth check failed:', error);
     } finally {
@@ -73,7 +82,11 @@ const App = () => {
             <Stack.Screen name="Login">
               {(props: NativeStackScreenProps<RootStackParamList, 'Login'>) => (
                 <LoginScreen
-                  onLoginSuccess={() => setIsAuthenticated(true)}
+                  onLoginSuccess={async () => {
+                    const hasCompletedTest = await AsyncStorage.getItem('hasCompletedPersonalityTest');
+                    setIsFirstLogin(!hasCompletedTest);
+                    setIsAuthenticated(true);
+                  }}
                   onSignUpPress={() => props.navigation.navigate('SignUp')}
                 />
               )}
@@ -81,14 +94,32 @@ const App = () => {
             <Stack.Screen name="SignUp">
               {(props: NativeStackScreenProps<RootStackParamList, 'SignUp'>) => (
                 <SignUpScreen
-                  onSignUpSuccess={() => setIsAuthenticated(true)}
+                  onSignUpSuccess={async () => {
+                    setIsFirstLogin(true);
+                    setIsAuthenticated(true);
+                  }}
                   onLoginPress={() => props.navigation.navigate('Login')}
                 />
               )}
             </Stack.Screen>
           </>
         ) : (
-          <Stack.Screen name="MainTabs" component={TabNavigator} />
+          <>
+            {isFirstLogin ? (
+              <Stack.Screen name="PersonalityTest">
+                {() => (
+                  <PersonalityTestScreen
+                    onComplete={async (result) => {
+                      await AsyncStorage.setItem('hasCompletedPersonalityTest', 'true');
+                      setIsFirstLogin(false);
+                    }}
+                  />
+                )}
+              </Stack.Screen>
+            ) : (
+              <Stack.Screen name="MainTabs" component={TabNavigator} />
+            )}
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>

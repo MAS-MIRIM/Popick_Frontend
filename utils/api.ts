@@ -1,4 +1,5 @@
 import AsyncStorage from './storage';
+import { personalityTestQuestions, personalityTestCharacters, calculatePersonalityTestResult } from './personalityTestData';
 
 const BASE_URL = 'http://api.hjun.kr/hackathon';
 
@@ -166,6 +167,108 @@ class ApiService {
       return !!profile.user;
     } catch (error) {
       return false;
+    }
+  }
+
+  static async get(endpoint: string): Promise<any> {
+    // Personality Test 엔드포인트는 로컬 데이터 사용 (서버 API 미구현)
+    if (endpoint === '/personality-test/questions') {
+      console.log('[API] Using local data for personality-test/questions');
+      return Promise.resolve(personalityTestQuestions);
+    }
+    
+    if (endpoint === '/personality-test/characters') {
+      console.log('[API] Using local data for personality-test/characters');
+      return Promise.resolve(personalityTestCharacters);
+    }
+
+    try {
+      const token = await this.getToken();
+      const headers: any = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      console.log(`[API] GET request to: ${BASE_URL}${endpoint}`);
+      
+      const response = await fetch(`${BASE_URL}${endpoint}`, {
+        method: 'GET',
+        headers,
+      });
+
+      const data = await response.json();
+      console.log('[API] GET response:', {
+        status: response.status,
+        data: data
+      });
+
+      if (!response.ok) {
+        console.log('[API] GET error:', data);
+        throw data;
+      }
+
+      return data;
+    } catch (error) {
+      console.log('[API] GET exception:', error);
+      throw error;
+    }
+  }
+
+  static async post(endpoint: string, body: any): Promise<any> {
+    // Personality Test 결과 엔드포인트는 로컬에서 계산 (서버 API 미구현)
+    if (endpoint === '/personality-test/result') {
+      console.log('[API] Using local calculation for personality-test/result');
+      console.log('[API] Answers:', body.answers);
+      
+      if (!body.answers || !Array.isArray(body.answers) || body.answers.length !== 10) {
+        throw {
+          statusCode: 400,
+          message: 'Invalid answers format'
+        };
+      }
+      
+      const result = calculatePersonalityTestResult(body.answers);
+      console.log('[API] Calculated result:', result);
+      return Promise.resolve(result);
+    }
+
+    try {
+      const token = await this.getToken();
+      const headers: any = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      console.log(`[API] POST request to: ${BASE_URL}${endpoint}`);
+      console.log('[API] POST body:', body);
+      
+      const response = await fetch(`${BASE_URL}${endpoint}`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json();
+      console.log('[API] POST response:', {
+        status: response.status,
+        data: data
+      });
+
+      if (!response.ok) {
+        console.log('[API] POST error:', data);
+        throw data;
+      }
+
+      return data;
+    } catch (error) {
+      console.log('[API] POST exception:', error);
+      throw error;
     }
   }
 }
