@@ -16,7 +16,7 @@ describe('LoginScreen', () => {
       <LoginScreen onLoginSuccess={() => {}} />
     );
 
-    expect(getByText(/오픽에서 사용했던/)).toBeTruthy();
+    expect(getByText(/POP!CK에서 사용했던/)).toBeTruthy();
     expect(getByText(/정보를 입력해주세요/)).toBeTruthy();
     expect(getByPlaceholderText('아이디를 입력해주세요.')).toBeTruthy();
     expect(getByPlaceholderText('비밀번호를 입력해주세요.')).toBeTruthy();

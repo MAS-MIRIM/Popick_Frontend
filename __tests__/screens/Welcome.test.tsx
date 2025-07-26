@@ -9,7 +9,7 @@ describe('Welcome Screen', () => {
     );
 
     expect(getByText('반가워요!')).toBeTruthy();
-    expect(getByText(/오픽과 함께 최고의 여정을/)).toBeTruthy();
+    expect(getByText(/POP!CK과 함께 최고의 여정을/)).toBeTruthy();
     expect(getByText('시작하기')).toBeTruthy();
     expect(getByText('이미 계정이 있다면?')).toBeTruthy();
     expect(getByText('로그인하기')).toBeTruthy();

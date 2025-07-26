@@ -57,7 +57,7 @@ const LoginScreen = ({onLoginSuccess, onSignUpPress}: LoginScreenProps) => {
       <Spacer />
       
       <ContentContainer>
-        <StepTitle>오픽에서 사용했던{'\n'}정보를 입력해주세요.</StepTitle>
+        <StepTitle>POP!CK에서 사용했던{'\n'}정보를 입력해주세요.</StepTitle>
         
         <InputContainer>
           <InputWrapper hasError={!!idError}>

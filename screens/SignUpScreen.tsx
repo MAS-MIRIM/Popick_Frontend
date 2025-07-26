@@ -142,7 +142,7 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
       case 1:
         return (
           <>
-            <StepTitle>오픽에서 사용하실{'\n'}아이디를 입력해주세요.</StepTitle>
+            <StepTitle>POP!CK에서 사용하실{'\n'}아이디를 입력해주세요.</StepTitle>
             <InputContainer>
               <InputWrapper hasError={!!idError}>
                 <StyledInput
@@ -168,7 +168,7 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
         return (
           <>
             <StepTitle>
-              오픽에서 사용하실{'\n'}비밀번호를 입력해주세요.
+              POP!CK에서 사용하실{'\n'}비밀번호를 입력해주세요.
             </StepTitle>
             <InputContainer>
               <InputWrapper hasError={!!passwordError}>
@@ -213,7 +213,7 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
       case 3:
         return (
           <>
-            <StepTitle>오픽에서 사용하실{'\n'}닉네임을 입력해주세요.</StepTitle>
+            <StepTitle>POP!CK에서 사용하실{'\n'}닉네임을 입력해주세요.</StepTitle>
             <InputContainer>
               <InputWrapper>
                 <StyledInput

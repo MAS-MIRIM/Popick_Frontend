@@ -22,17 +22,16 @@ const DogamScreen = () => {
   const [selectedCharacter, setSelectedCharacter] = useState<CharacterInfo | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [loadingInfo, setLoadingInfo] = useState(false);
-  const [ownedCharacterIds, setOwnedCharacterIds] = useState<string[]>([]);
-  const [selectedSeries, setSelectedSeries] = useState<string>('all');
+  const [dogamCharacterIds, setDogamCharacterIds] = useState<string[]>([]);
 
   useEffect(() => {
     loadCharacters();
-    loadOwnedCharacters();
+    loadDogamCharacters();
   }, []);
 
   useFocusEffect(
     React.useCallback(() => {
-      loadOwnedCharacters();
+      loadDogamCharacters();
     }, [])
   );
 
@@ -49,14 +48,14 @@ const DogamScreen = () => {
     }
   };
 
-  const loadOwnedCharacters = async () => {
+  const loadDogamCharacters = async () => {
     try {
-      const stored = await AsyncStorage.getItem('ownedCharacters');
+      const stored = await AsyncStorage.getItem('dogamCharacters');
       if (stored) {
-        setOwnedCharacterIds(JSON.parse(stored));
+        setDogamCharacterIds(JSON.parse(stored));
       }
     } catch (error) {
-      console.error('[DogamScreen] Error loading owned characters:', error);
+      console.error('[DogamScreen] Error loading dogam characters:', error);
     }
   };
 
@@ -119,37 +118,17 @@ const DogamScreen = () => {
         <Text style={styles.headerTitle}>캐릭터 도감</Text>
       </View>
 
-      {/* 시리즈 필터 (추천픽) */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.seriesFilter}>
-        <TouchableOpacity
-          style={[styles.seriesTab, selectedSeries === 'all' && styles.seriesTabActive]}
-          onPress={() => setSelectedSeries('all')}
-        >
-          <Text style={[styles.seriesTabText, selectedSeries === 'all' && styles.seriesTabTextActive]}>전체</Text>
-        </TouchableOpacity>
-        {Array.from(new Set(characters.map(c => c.seriesKo))).map(series => (
-          <TouchableOpacity
-            key={series}
-            style={[styles.seriesTab, selectedSeries === series && styles.seriesTabActive]}
-            onPress={() => setSelectedSeries(series)}
-          >
-            <Text style={[styles.seriesTabText, selectedSeries === series && styles.seriesTabTextActive]}>{series}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
 
       {/* 캐릭터 그리드 */}
       <View style={styles.characterGrid}>
-        {characters
-          .filter(character => selectedSeries === 'all' || character.seriesKo === selectedSeries)
-          .map((character) => (
+        {characters.map((character) => (
           <TouchableOpacity 
             key={character.id} 
             style={styles.characterItem}
             onPress={() => handleCharacterPress(character)}
           >
-            <View style={[styles.characterCard, ownedCharacterIds.includes(character.id) && styles.characterCardOwned]}>
-              {ownedCharacterIds.includes(character.id) && (
+            <View style={[styles.characterCard, dogamCharacterIds.includes(character.id) && styles.characterCardOwned]}>
+              {dogamCharacterIds.includes(character.id) && (
                 <View style={styles.checkMark}>
                   <Text style={styles.checkMarkText}>✓</Text>
                 </View>
@@ -239,12 +218,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 50,
-    paddingBottom: 20,
+    paddingTop: 20,
+    paddingBottom: 24,
     paddingHorizontal: 36,
     backgroundColor: '#F1F1F1',
   },
   headerTitle: {
+    marginTop: 60,
     fontSize: 22,
     fontWeight: '900',
   },

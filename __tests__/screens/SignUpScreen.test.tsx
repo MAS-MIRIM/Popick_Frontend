@@ -15,7 +15,7 @@ describe('SignUpScreen', () => {
     const {getByText, getByPlaceholderText} = render(<SignUpScreen />);
 
     // Check step title
-    expect(getByText(/오픽에서 사용하실/)).toBeTruthy();
+    expect(getByText(/POP!CK에서 사용하실/)).toBeTruthy();
     expect(getByText(/아이디를 입력해주세요/)).toBeTruthy();
 
     // Check input and button
@@ -105,7 +105,7 @@ describe('SignUpScreen', () => {
 
     // Should move to step 2
     await waitFor(() => {
-      expect(getByText(/오픽에서 사용하실/)).toBeTruthy();
+      expect(getByText(/POP!CK에서 사용하실/)).toBeTruthy();
       expect(getByText(/비밀번호를 입력해주세요/)).toBeTruthy();
       expect(getByPlaceholderText('비밀번호를 입력해주세요.')).toBeTruthy();
       expect(getByPlaceholderText('비밀번호를 다시 한 번 입력해주세요.')).toBeTruthy();

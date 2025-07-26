@@ -264,10 +264,20 @@ const CharacterShoppingApp = () => {
         ownedCharacters.push(character.id);
         await AsyncStorage.setItem('ownedCharacters', JSON.stringify(ownedCharacters));
         console.log('[HomeScreen] Added character to owned:', character.nameKo);
+        
+        // Also add to dogam
+        const dogamStored = await AsyncStorage.getItem('dogamCharacters');
+        let dogamCharacters = dogamStored ? JSON.parse(dogamStored) : [];
+        if (!dogamCharacters.includes(character.id)) {
+          dogamCharacters.push(character.id);
+          await AsyncStorage.setItem('dogamCharacters', JSON.stringify(dogamCharacters));
+          console.log('[HomeScreen] Added character to dogam:', character.nameKo);
+        }
+        
+        alert(`${character.nameKo}를 소유 캐릭터에 추가했습니다!`);
+      } else {
+        alert(`${character.nameKo}는 이미 소유한 캐릭터입니다.`);
       }
-      
-      // Navigate to MyPage on owned tab
-      navigation.navigate('마이' as never);
     } catch (error) {
       console.error('[HomeScreen] Error adding owned character:', error);
     }

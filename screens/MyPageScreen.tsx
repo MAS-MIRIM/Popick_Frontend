@@ -110,9 +110,10 @@ const UserNickname = styled.Text`
 `;
 
 const TestResultCharacter = styled.Text`
-  color: #6b7280;
-  font-size: 14px;
+  color: #6e6e6eff;
+  font-size: 16px;
   margin-top: 4px;
+  font-weight: 500;
 `;
 
 const StatsContainer = styled.View`
@@ -352,7 +353,9 @@ const ProfileScreen = () => {
           
           <ProfileDetails>
             <UserNickname>{user?.nickname || '사용자'}</UserNickname>
-            <TestResultCharacter>{testResult || '테스트를 진행해주세요'}</TestResultCharacter>
+            <TestResultCharacter>
+              {testResult ? `${testResult}` : '테스트를 진행해주세요'}
+            </TestResultCharacter>
           </ProfileDetails>
         </ProfileInfo>
 
@@ -424,16 +427,9 @@ const ProfileScreen = () => {
                   </OwnedItem>
                 );
               })}
-              {ownedToyIds.length > 0 && (
-                <AddItemButton onPress={() => navigation.navigate('홈' as never)}>
-                  <AddItemText>+</AddItemText>
-                </AddItemButton>
-              )}
-              {ownedToyIds.length === 0 && (
-                <AddItemButton onPress={() => navigation.navigate('홈' as never)}>
-                  <AddItemText>+</AddItemText>
-                </AddItemButton>
-              )}
+              <AddItemButton onPress={() => navigation.navigate('HomeTab' as never)}>
+                <AddItemText>+</AddItemText>
+              </AddItemButton>
             </OwnedGrid>
           )}
         </ScrollView>
