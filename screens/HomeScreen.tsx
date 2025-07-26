@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
+import { toysData } from '../utils/toysData';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -290,21 +291,24 @@ const CharacterShoppingApp = () => {
     }
   ];
 
-  const tabs = ['ALL', '디무', '라부부', '몰리', '스컬판다', '지거', '크라이베이비', '키노', '피노젤리', '푸키', '하치푸푸'];
+  const tabs = ['ALL', 'DIMOO', 'LABUBU', 'MOLLY', 'SKULLPANDA', 'KUBO', 'CRYBABY', 'HIRONO', 'PUCKY'];
 
-  const products = [
-    { id: 1, name: '라부부', subtitle: 'THE MONSTERS', description: '원래 곳 이기를 잘고 있는', likes: '14k', colorDot: '#ff7675' },
-    { id: 2, name: '팝마트 라부부 더 몬스터즈', subtitle: '하이라이트 시리즈 종류 키링', likes: '12k', colorDot: '#74b9ff' },
-    { id: 3, name: '팝마트 라부부 더 몬스터즈', subtitle: '하이라이트 시리즈 종류 키링', likes: '17k', colorDot: '#a29bfe' },
-    { id: 4, name: '팝마트 라부부 더 몬스터즈', subtitle: '하이라이트 시리즈 종류 키링', likes: '11k', colorDot: '#ffeaa7' },
-    { id: 5, name: '팝마트 라부부 더 몬스터즈', subtitle: '하이라이트 시리즈 종류 키링', likes: '21k', colorDot: '#636e72' },
-    { id: 6, name: '팝마트 라부부 더 몬스터즈', subtitle: '라부부 테이스트 마카롱', likes: '15k', colorDot: '#e17055' },
-  ];
+  const getFilteredProducts = () => {
+    if (activeTab === 'ALL') {
+      return toysData;
+    }
+    return toysData.filter(toy => toy.name.toUpperCase() === activeTab);
+  };
+
+  const products = getFilteredProducts();
 
   const renderProduct = ({ item, index }) => (
-    <ProductCard style={{ marginRight: index % 2 === 0 ? '2%' : 0 }}>
+    <ProductCard 
+      style={{ marginRight: index % 2 === 0 ? '2%' : 0 }}
+      onPress={() => Linking.openURL(item.popmartUrl)}
+    >
       <View style={{ position: 'relative' }}>
-        <ProductImage source={require('../assets/background.png')} />
+        <ProductImage source={{ uri: item.imageUrl }} />
         <View style={{ 
           position: 'absolute', 
           top: 10, 
@@ -317,21 +321,25 @@ const CharacterShoppingApp = () => {
           borderRadius: 14 
         }}>
           <Text style={{ fontSize: 12 }}>❤️</Text>
-          <LikeCount style={{ color: 'white', marginLeft: 4 }}>{item.likes}</LikeCount>
+          <LikeCount style={{ color: 'white', marginLeft: 4 }}>{Math.floor(Math.random() * 20 + 5)}k</LikeCount>
         </View>
-        <View style={{ 
-          position: 'absolute',
-          bottom: 10,
-          right: 10,
-          width: 10, 
-          height: 10, 
-          borderRadius: 5, 
-          backgroundColor: item.colorDot 
-        }} />
+        {item.isLimited && (
+          <View style={{ 
+            position: 'absolute',
+            bottom: 10,
+            right: 10,
+            backgroundColor: '#ff4757',
+            paddingHorizontal: 8,
+            paddingVertical: 4,
+            borderRadius: 10
+          }}>
+            <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>LIMITED</Text>
+          </View>
+        )}
       </View>
       <ProductInfo>
-        <ProductName>{item.name}</ProductName>
-        <ProductSubtext>{item.subtitle}</ProductSubtext>
+        <ProductName>{item.nameKo}</ProductName>
+        <ProductSubtext>{item.seriesKo}</ProductSubtext>
         <ProductSubtext>{item.description}</ProductSubtext>
       </ProductInfo>
     </ProductCard>
