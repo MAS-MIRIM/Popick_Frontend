@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -10,16 +10,17 @@ import {
   ActivityIndicator,
   Modal,
 } from 'react-native';
-import CharacterAPI, { Character, CharacterInfo } from '../utils/characterApi';
+import CharacterAPI, {Character, CharacterInfo} from '../utils/characterApi';
 import AsyncStorage from '../utils/storage';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const DogamScreen = () => {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCharacter, setSelectedCharacter] = useState<CharacterInfo | null>(null);
+  const [selectedCharacter, setSelectedCharacter] =
+    useState<CharacterInfo | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [loadingInfo, setLoadingInfo] = useState(false);
   const [dogamCharacterIds, setDogamCharacterIds] = useState<string[]>([]);
@@ -32,7 +33,7 @@ const DogamScreen = () => {
   useFocusEffect(
     React.useCallback(() => {
       loadDogamCharacters();
-    }, [])
+    }, []),
   );
 
   const loadCharacters = async () => {
@@ -63,7 +64,7 @@ const DogamScreen = () => {
     try {
       setLoadingInfo(true);
       setModalVisible(true);
-      
+
       // 캐릭터 상세 정보 가져오기
       const info = await CharacterAPI.getCharacterInfo(character.id);
       if (info) {
@@ -118,23 +119,26 @@ const DogamScreen = () => {
         <Text style={styles.headerTitle}>캐릭터 도감</Text>
       </View>
 
-
       {/* 캐릭터 그리드 */}
       <View style={styles.characterGrid}>
-        {characters.map((character) => (
-          <TouchableOpacity 
-            key={character.id} 
+        {characters.map(character => (
+          <TouchableOpacity
+            key={character.id}
             style={styles.characterItem}
-            onPress={() => handleCharacterPress(character)}
-          >
-            <View style={[styles.characterCard, dogamCharacterIds.includes(character.id) && styles.characterCardOwned]}>
+            onPress={() => handleCharacterPress(character)}>
+            <View
+              style={[
+                styles.characterCard,
+                dogamCharacterIds.includes(character.id) &&
+                  styles.characterCardOwned,
+              ]}>
               {dogamCharacterIds.includes(character.id) && (
                 <View style={styles.checkMark}>
                   <Text style={styles.checkMarkText}>✓</Text>
                 </View>
               )}
-              <Image 
-                source={{ uri: character.imageUrl }} 
+              <Image
+                source={{uri: character.imageUrl}}
                 style={styles.characterImage}
                 resizeMode="contain"
               />
@@ -150,8 +154,7 @@ const DogamScreen = () => {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={closeModal}
-      >
+        onRequestClose={closeModal}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             {loadingInfo ? (
@@ -160,33 +163,50 @@ const DogamScreen = () => {
               </View>
             ) : selectedCharacter ? (
               <>
-                <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={closeModal}>
                   <Text style={styles.closeButtonText}>✕</Text>
                 </TouchableOpacity>
-                
-                <ScrollView horizontal pagingEnabled style={styles.imageScrollView}>
+
+                <ScrollView
+                  horizontal
+                  pagingEnabled
+                  style={styles.imageScrollView}>
                   {selectedCharacter.images.map((imageUrl, index) => (
                     <Image
                       key={index}
-                      source={{ uri: imageUrl }}
+                      source={{uri: imageUrl}}
                       style={styles.modalImage}
                       resizeMode="contain"
                     />
                   ))}
                 </ScrollView>
-                
+
                 <View style={styles.modalInfo}>
-                  <Text style={styles.modalTitle}>{selectedCharacter.nameKo}</Text>
-                  <Text style={styles.modalSubtitle}>{selectedCharacter.name}</Text>
-                  <Text style={styles.modalSeries}>{selectedCharacter.seriesKo}</Text>
-                  <Text style={styles.modalDescription}>{selectedCharacter.description}</Text>
-                  
+                  <Text style={styles.modalTitle}>
+                    {selectedCharacter.nameKo}
+                  </Text>
+                  <Text style={styles.modalSubtitle}>
+                    {selectedCharacter.name}
+                  </Text>
+                  <Text style={styles.modalSeries}>
+                    {selectedCharacter.seriesKo}
+                  </Text>
+                  <Text style={styles.modalDescription}>
+                    {selectedCharacter.description}
+                  </Text>
+
                   {selectedCharacter.price && (
-                    <Text style={styles.modalPrice}>₩{selectedCharacter.price.toLocaleString()}</Text>
+                    <Text style={styles.modalPrice}>
+                      ₩{selectedCharacter.price.toLocaleString()}
+                    </Text>
                   )}
-                  
+
                   {selectedCharacter.releaseDate && (
-                    <Text style={styles.modalReleaseDate}>출시일: {selectedCharacter.releaseDate}</Text>
+                    <Text style={styles.modalReleaseDate}>
+                      출시일: {selectedCharacter.releaseDate}
+                    </Text>
                   )}
                 </View>
               </>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {
   View,
   FlatList,
@@ -15,7 +15,7 @@ import {
   Animated,
 } from 'react-native';
 import styled from 'styled-components/native';
-import ApiService, { YouTubeVideo } from '../utils/api';
+import ApiService, {YouTubeVideo} from '../utils/api';
 
 let WebView: any;
 try {
@@ -24,7 +24,7 @@ try {
   console.warn('WebView not available, will use fallback');
 }
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 
 const ShortPickScreen = () => {
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
@@ -46,12 +46,19 @@ const ShortPickScreen = () => {
         setLoading(true);
       }
 
-      const response = await ApiService.getYouTubeShorts('라부부', 'gaon', page, 5);
-      
+      const response = await ApiService.getYouTubeShorts(
+        '라부부',
+        'gaon',
+        page,
+        5,
+      );
+
       // Check if we got videos
       if (!response.videos || response.videos.length === 0) {
-        console.warn('[ShortPickScreen] No videos returned from API, using mock data');
-        
+        console.warn(
+          '[ShortPickScreen] No videos returned from API, using mock data',
+        );
+
         // Use mock data for development/testing
         const mockVideos: YouTubeVideo[] = [
           {
@@ -85,7 +92,7 @@ const ShortPickScreen = () => {
             viewCount: '691197',
           },
         ];
-        
+
         if (page === 1) {
           setVideos(mockVideos);
           setHasMore(false);
@@ -95,13 +102,13 @@ const ShortPickScreen = () => {
           return;
         }
       }
-      
+
       if (isRefresh || page === 1) {
         setVideos(response.videos);
       } else {
         setVideos(prev => [...prev, ...response.videos]);
       }
-      
+
       setHasMore(response.hasMore);
       setCurrentPage(page);
     } catch (error: any) {
@@ -128,7 +135,7 @@ const ShortPickScreen = () => {
     }
   };
 
-  const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
+  const onViewableItemsChanged = useRef(({viewableItems}: any) => {
     if (viewableItems.length > 0) {
       setCurrentVideoIndex(viewableItems[0].index);
     }
@@ -146,15 +153,19 @@ const ShortPickScreen = () => {
     return count;
   };
 
-  const renderVideo = ({ item, index }: { item: YouTubeVideo; index: number }) => {
-    const embedUrl = `https://www.youtube.com/embed/${item.id}?playsinline=1&controls=1&modestbranding=1&rel=0&showinfo=0&fs=1&autoplay=${index === currentVideoIndex ? '1' : '0'}&mute=0&loop=1&playlist=${item.id}`;
+  const renderVideo = ({item, index}: {item: YouTubeVideo; index: number}) => {
+    const embedUrl = `https://www.youtube.com/embed/${
+      item.id
+    }?playsinline=1&controls=1&modestbranding=1&rel=0&showinfo=0&fs=1&autoplay=${
+      index === currentVideoIndex ? '1' : '0'
+    }&mute=0&loop=1&playlist=${item.id}`;
 
     return (
       <VideoContainer>
         {WebView ? (
           <WebView
-            source={{ uri: embedUrl }}
-            style={{ flex: 1, backgroundColor: '#000' }}
+            source={{uri: embedUrl}}
+            style={{flex: 1, backgroundColor: '#000'}}
             allowsFullscreenVideo={true}
             mediaPlaybackRequiresUserAction={false}
             javaScriptEnabled={true}
@@ -168,10 +179,25 @@ const ShortPickScreen = () => {
             )}
           />
         ) : (
-          <View style={{ flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }}>
-            <Image source={{ uri: item.thumbnail }} style={{ width: '100%', height: 300, resizeMode: 'cover' }} />
-            <View style={{ position: 'absolute', backgroundColor: 'rgba(0,0,0,0.5)', padding: 20, borderRadius: 40 }}>
-              <Text style={{ color: 'white', fontSize: 40 }}>▶️</Text>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: '#000',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Image
+              source={{uri: item.thumbnail}}
+              style={{width: '100%', height: 300, resizeMode: 'cover'}}
+            />
+            <View
+              style={{
+                position: 'absolute',
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                padding: 20,
+                borderRadius: 40,
+              }}>
+              <Text style={{color: 'white', fontSize: 40}}>▶️</Text>
             </View>
           </View>
         )}
@@ -191,7 +217,11 @@ const ShortPickScreen = () => {
   if (loading && videos.length === 0) {
     return (
       <LoadingContainer>
-        <ActivityIndicator size="large" color="#FF4757" testID="loading-indicator" />
+        <ActivityIndicator
+          size="large"
+          color="#FF4757"
+          testID="loading-indicator"
+        />
       </LoadingContainer>
     );
   }
@@ -214,7 +244,7 @@ const ShortPickScreen = () => {
         ref={flatListRef}
         data={videos}
         renderItem={renderVideo}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         pagingEnabled
         snapToInterval={screenHeight}
         snapToAlignment="start"
@@ -295,10 +325,10 @@ const EmptyText = styled.Text`
 `;
 
 const RefreshButton = styled.TouchableOpacity`
-  background-color: #FF4757;
+  background-color: #ff4757;
   padding: 14px 28px;
   border-radius: 25px;
-  shadow-color: #FF4757;
+  shadow-color: #ff4757;
   shadow-offset: 0px 4px;
   shadow-opacity: 0.3;
   shadow-radius: 8px;

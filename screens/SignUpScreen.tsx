@@ -113,8 +113,12 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
     } else if (currentStep === 3) {
       if (nickname.trim().length > 0) {
         try {
-          const response = await ApiService.register(userId, password, nickname);
-          
+          const response = await ApiService.register(
+            userId,
+            password,
+            nickname,
+          );
+
           // 회원가입 성공 후 자동 로그인
           await ApiService.login(userId, password);
           // 첫 회원가입 표시
@@ -127,7 +131,9 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
             setIsIdChecked(false);
             setIsIdValid(false);
           } else if (error.statusCode === 400) {
-            const message = Array.isArray(error.message) ? error.message.join('\n') : error.message;
+            const message = Array.isArray(error.message)
+              ? error.message.join('\n')
+              : error.message;
             Alert.alert('회원가입 실패', message);
           } else {
             Alert.alert('오류', '회원가입 중 문제가 발생했습니다.');
@@ -142,7 +148,9 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
       case 1:
         return (
           <>
-            <StepTitle>POP!CK에서 사용하실{'\n'}아이디를 입력해주세요.</StepTitle>
+            <StepTitle>
+              POP!CK에서 사용하실{'\n'}아이디를 입력해주세요.
+            </StepTitle>
             <InputContainer>
               <InputWrapper hasError={!!idError}>
                 <StyledInput
@@ -213,7 +221,9 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
       case 3:
         return (
           <>
-            <StepTitle>POP!CK에서 사용하실{'\n'}닉네임을 입력해주세요.</StepTitle>
+            <StepTitle>
+              POP!CK에서 사용하실{'\n'}닉네임을 입력해주세요.
+            </StepTitle>
             <InputContainer>
               <InputWrapper>
                 <StyledInput
@@ -263,9 +273,11 @@ const SignUpScreen = ({onSignUpSuccess, onLoginPress}: SignUpScreenProps) => {
               ? nickname.trim().length === 0
               : false
           }>
-          <NextButtonText>{currentStep === 3 ? '완료' : '다음으로'}</NextButtonText>
+          <NextButtonText>
+            {currentStep === 3 ? '완료' : '다음으로'}
+          </NextButtonText>
         </NextButton>
-        
+
         <LoginContainer>
           <LoginText>이미 계정이 있으신가요? </LoginText>
           <LoginLink onPress={onLoginPress}>
@@ -298,7 +310,7 @@ const ProgressBar = styled.View`
 const ProgressFill = styled.View<{width: number}>`
   height: 100%;
   width: ${props => props.width}%;
-  background-color: #F63F4E;
+  background-color: #f63f4e;
   border-radius: 3px;
 `;
 
@@ -332,7 +344,7 @@ const StyledInput = styled.TextInput`
 `;
 
 const DuplicateCheckButton = styled.TouchableOpacity`
-  border: #F63F4E;
+  border: #f63f4e;
   padding: 8px 16px;
   margin-right: 8px;
   border-radius: 20px;
@@ -341,7 +353,7 @@ const DuplicateCheckButton = styled.TouchableOpacity`
 `;
 
 const DuplicateCheckText = styled.Text`
-  color: #F63F4E;
+  color: #f63f4e;
   font-weight: 600;
   font-size: 13px;
 `;
@@ -406,7 +418,7 @@ const LoginLink = styled.TouchableOpacity``;
 
 const LoginLinkText = styled.Text`
   font-size: 14px;
-  color: #F63F4E;
+  color: #f63f4e;
   font-weight: 600;
   text-decoration-line: underline;
 `;

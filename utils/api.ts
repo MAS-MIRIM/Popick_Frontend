@@ -1,7 +1,11 @@
 import AsyncStorage from './storage';
-import { personalityTestQuestions, personalityTestCharacters, calculatePersonalityTestResult, PersonalityTestResult } from './personalityTestData';
+import {
+  personalityTestQuestions,
+  personalityTestCharacters,
+  calculatePersonalityTestResult,
+  PersonalityTestResult,
+} from './personalityTestData';
 
-// 백엔드 서버 주소 (CharacterAPI와 동일하게 설정)
 const BASE_URL = 'http://api.hjun.kr/hackathon';
 
 export interface User {
@@ -56,132 +60,54 @@ class ApiService {
     try {
       return await AsyncStorage.getItem('accessToken');
     } catch (error) {
-      console.error('Failed to get token:', error);
       return null;
     }
   }
 
   private static async saveToken(token: string): Promise<void> {
-    try {
-      await AsyncStorage.setItem('accessToken', token);
-    } catch (error) {
-      console.error('Failed to save token:', error);
-    }
+    await AsyncStorage.setItem('accessToken', token);
   }
 
   static async removeToken(): Promise<void> {
-    try {
-      await AsyncStorage.removeItem('accessToken');
-    } catch (error) {
-      console.error('Failed to remove token:', error);
-    }
+    await AsyncStorage.removeItem('accessToken');
   }
 
   static async login(id: string, password: string): Promise<LoginResponse> {
     try {
-      console.log('[API] Login request:', { id, password: '***' });
-      
-      let response;
-      try {
-        console.log('[API] Attempting to fetch:', `${BASE_URL}/auth/login`);
-        response = await fetch(`${BASE_URL}/auth/login`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ id, password }),
-        });
-        console.log('[API] Raw response:', response);
-        console.log('[API] Response status:', response.status);
-        console.log('[API] Response headers:', response.headers);
-      } catch (fetchError: any) {
-        console.log('[API] =================== FETCH ERROR ===================');
-        console.log('[API] Fetch error:', fetchError);
-        console.log('[API] Error type:', fetchError.constructor.name);
-        console.log('[API] Error message:', fetchError.message);
-        console.log('[API] Error code:', fetchError.code);
-        console.log('[API] Error stack:', fetchError.stack);
-        console.log('[API] Full error object:', JSON.stringify(fetchError, null, 2));
-        console.log('[API] ================================================');
-        throw fetchError;
-      }
-
-      const data = await response.json();
-      console.log('[API] Login response:', {
-        status: response.status,
-        statusText: response.statusText,
-        data: data
+      const response = await fetch(`${BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({id, password}),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        console.log('[API] Login error:', data);
         throw data;
       }
 
-      // 토큰세이브
       await this.saveToken(data.accessToken);
-
       return data;
     } catch (error) {
-      console.log('[API] Login exception:', error);
       throw error;
     }
   }
 
-  static async register(id: string, password: string, nickname: string): Promise<RegisterResponse> {
-    console.log('[API] Register request:', { id, password: '***', nickname });
-    console.log('[API] URL:', `${BASE_URL}/auth/register`);
-    
+  static async register(
+    id: string,
+    password: string,
+    nickname: string,
+  ): Promise<RegisterResponse> {
     try {
       const response = await fetch(`${BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id, password, nickname }),
+        body: JSON.stringify({id, password, nickname}),
       });
-
-      console.log('[API] Response status:', response.status);
-      console.log('[API] Response statusText:', response.statusText);
-      console.log('[API] Response headers:', response.headers);
-      
-      const data = await response.json();
-      console.log('[API] Response data:', JSON.stringify(data, null, 2));
-
-      if (!response.ok) {
-        console.log('[API] ❌ Register failed with status:', response.status);
-        console.log('[API] ❌ Error data:', data);
-        throw data;
-      }
-
-      console.log('[API] ✅ Register success');
-      return data;
-    } catch (error: any) {
-      console.log('[API] ❌ Register exception:');
-      console.log('[API] Error type:', error.constructor.name);
-      console.log('[API] Error message:', error.message || error);
-      console.log('[API] Full error:', error);
-      throw error;
-    }
-  }
-
-  static async getProfile(): Promise<ProfileResponse> {
-    try {
-      const token = await this.getToken();
-      
-      if (!token) {
-        throw new Error('No token found');
-      }
-
-      const response = await fetch(`${BASE_URL}/auth/profile`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      console.log(response);
 
       const data = await response.json();
 
@@ -193,6 +119,30 @@ class ApiService {
     } catch (error) {
       throw error;
     }
+  }
+
+  static async getProfile(): Promise<ProfileResponse> {
+    const token = await this.getToken();
+
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    const response = await fetch(`${BASE_URL}/auth/profile`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw data;
+    }
+
+    return data;
   }
 
   static async checkAuth(): Promise<boolean> {
@@ -208,159 +158,115 @@ class ApiService {
   }
 
   static async get(endpoint: string): Promise<any> {
-    // Personality Test 엔드포인트는 로컬 데이터 사용 (서버 API 미구현)
-    if (endpoint === '/personality-test/questions') {
-      console.log('[API] Using local data for personality-test/questions');
-      return Promise.resolve(personalityTestQuestions);
+    if (endpoint === '/personality-test/questions') return personalityTestQuestions;
+
+    if (endpoint === '/personality-test/characters') return personalityTestCharacters;
+
+    const token = await this.getToken();
+    const headers: any = {
+      'Content-Type': 'application/json',
+    };
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
     }
-    
-    if (endpoint === '/personality-test/characters') {
-      console.log('[API] Using local data for personality-test/characters');
-      return Promise.resolve(personalityTestCharacters);
+
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'GET',
+      headers,
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw data;
     }
 
-    try {
-      const token = await this.getToken();
-      const headers: any = {
-        'Content-Type': 'application/json',
-      };
-      
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      console.log(`[API] GET request to: ${BASE_URL}${endpoint}`);
-      
-      const response = await fetch(`${BASE_URL}${endpoint}`, {
-        method: 'GET',
-        headers,
-      });
-
-      const data = await response.json();
-      console.log('[API] GET response:', {
-        status: response.status,
-        data: data
-      });
-
-      if (!response.ok) {
-        console.log('[API] GET error:', data);
-        throw data;
-      }
-
-      return data;
-    } catch (error) {
-      console.log('[API] GET exception:', error);
-      throw error;
-    }
+    return data;
   }
 
   static async post(endpoint: string, body: any): Promise<any> {
-    // Personality Test 결과 엔드포인트는 로컬에서 계산 (서버 API 미구현)
     if (endpoint === '/personality-test/result') {
-      console.log('[API] Using local calculation for personality-test/result');
-      console.log('[API] Answers:', body.answers);
-      
-      if (!body.answers || !Array.isArray(body.answers) || body.answers.length !== 10) {
+      if (
+        !body.answers ||
+        !Array.isArray(body.answers) ||
+        body.answers.length !== 10
+      ) {
         throw {
           statusCode: 400,
-          message: 'Invalid answers format'
+          message: 'Invalid answers format',
         };
       }
-      
-      const result = calculatePersonalityTestResult(body.answers);
-      console.log('[API] Calculated result:', result);
-      return Promise.resolve(result);
+
+      return calculatePersonalityTestResult(body.answers);
     }
 
-    try {
-      const token = await this.getToken();
-      const headers: any = {
-        'Content-Type': 'application/json',
-      };
-      
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
+    const token = await this.getToken();
+    const headers: any = {
+      'Content-Type': 'application/json',
+    };
 
-      console.log(`[API] POST request to: ${BASE_URL}${endpoint}`);
-      console.log('[API] POST body:', body);
-      
-      const response = await fetch(`${BASE_URL}${endpoint}`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(body),
-      });
-
-      const data = await response.json();
-      console.log('[API] POST response:', {
-        status: response.status,
-        data: data
-      });
-
-      if (!response.ok) {
-        console.log('[API] POST error:', data);
-        throw data;
-      }
-
-      return data;
-    } catch (error) {
-      console.log('[API] POST exception:', error);
-      throw error;
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
     }
+
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw data;
+    }
+
+    return data;
   }
 
-  static async savePersonalityTestResult(result: PersonalityTestResult): Promise<void> {
-    try {
-      await AsyncStorage.setItem('personalityTestResult', JSON.stringify(result));
-      await AsyncStorage.setItem('hasCompletedPersonalityTest', 'true');
-    } catch (error) {
-      console.error('Failed to save personality test result:', error);
-    }
+  static async savePersonalityTestResult(
+    result: PersonalityTestResult,
+  ): Promise<void> {
+    await AsyncStorage.setItem('personalityTestResult', JSON.stringify(result));
+    await AsyncStorage.setItem('hasCompletedPersonalityTest', 'true');
   }
 
-  static async getYouTubeShorts(search: string, userId: string, page: number = 1, limit: number = 5): Promise<YouTubeShortsResponse> {
-    try {
-      const token = await this.getToken();
-      const headers: any = {
-        'Content-Type': 'application/json',
-      };
-      
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
+  static async getYouTubeShorts(
+    search: string,
+    userId: string,
+    page: number = 1,
+    limit: number = 5,
+  ): Promise<YouTubeShortsResponse> {
+    const token = await this.getToken();
+    const headers: any = {
+      'Content-Type': 'application/json',
+    };
 
-      console.log(`[API] Fetching YouTube shorts: search=${search}, page=${page}, limit=${limit}`);
-      
-      const response = await fetch(`${BASE_URL}/youtube/shorts?page=${page}&limit=${limit}`, {
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await fetch(
+      `${BASE_URL}/youtube/shorts?page=${page}&limit=${limit}`,
+      {
         method: 'POST',
         headers,
-        body: JSON.stringify({ search, userId }),
-      });
+        body: JSON.stringify({search, userId}),
+      },
+    );
 
-      const data = await response.json();
-      console.log('[API] YouTube shorts response:', {
-        status: response.status,
-        videosCount: data.videos?.length || 0,
-        hasMore: data.hasMore,
-        fullResponse: JSON.stringify(data)
-      });
+    const data = await response.json();
 
-      if (!response.ok) {
-        console.log('[API] YouTube shorts error:', data);
-        throw data;
-      }
-
-      // Check if we got a valid response structure
-      if (!data.videos || !Array.isArray(data.videos)) {
-        console.log('[API] Invalid response structure:', data);
-        throw new Error('Invalid response format from YouTube shorts API');
-      }
-
-      return data;
-    } catch (error) {
-      console.log('[API] YouTube shorts exception:', error);
-      throw error;
+    if (!response.ok) {
+      throw data;
     }
+
+    if (!data.videos || !Array.isArray(data.videos)) {
+      throw new Error('Invalid response format from YouTube shorts API');
+    }
+
+    return data;
   }
 }
 

@@ -48,7 +48,7 @@ const Logo = styled.Image`
 
 const Button = styled.TouchableOpacity`
   width: 100%;
-  background-color: #F63F4E;
+  background-color: #f63f4e;
   padding: 15px;
   border-radius: 8px;
   margin-vertical: 8px;
@@ -85,7 +85,7 @@ const LoginLink = styled.TouchableOpacity``;
 
 const LoginLinkText = styled.Text`
   font-size: 14px;
-  color: #F63F4E;
+  color: #f63f4e;
   font-weight: 600;
   text-decoration-line: underline;
 `;

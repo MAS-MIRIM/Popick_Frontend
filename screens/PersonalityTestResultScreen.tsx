@@ -1,8 +1,19 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import styled from 'styled-components/native';
-import { SafeAreaView, StatusBar, ScrollView, TouchableOpacity, Image, View, ActivityIndicator } from 'react-native';
-import { PersonalityTestResult, personalityTestCharacters } from '../utils/personalityTestData';
-import { useNavigation } from '@react-navigation/native';
+import {
+  SafeAreaView,
+  StatusBar,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  View,
+  ActivityIndicator,
+} from 'react-native';
+import {
+  PersonalityTestResult,
+  personalityTestCharacters,
+} from '../utils/personalityTestData';
+import {useNavigation} from '@react-navigation/native';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -123,9 +134,9 @@ const ScoreBarContainer = styled.View`
   margin: 0 10px;
 `;
 
-const ScoreBar = styled.View<{ width: number; isTop: boolean }>`
+const ScoreBar = styled.View<{width: number; isTop: boolean}>`
   height: 100%;
-  background-color: ${props => props.isTop ? '#ef4444' : '#fca5a5'};
+  background-color: ${props => (props.isTop ? '#ef4444' : '#fca5a5')};
   width: ${props => props.width}%;
 `;
 
@@ -157,10 +168,10 @@ const SecondaryButton = styled(TouchableOpacity)`
   border-color: #e5e7eb;
 `;
 
-const ButtonText = styled.Text<{ primary?: boolean }>`
+const ButtonText = styled.Text<{primary?: boolean}>`
   font-size: 16px;
   font-weight: 600;
-  color: ${props => props.primary ? '#fff' : '#2d3436'};
+  color: ${props => (props.primary ? '#fff' : '#2d3436')};
 `;
 
 interface Props {
@@ -168,7 +179,7 @@ interface Props {
   onRetake?: () => void;
 }
 
-const PersonalityTestResultScreen: React.FC<Props> = ({ result, onRetake }) => {
+const PersonalityTestResultScreen: React.FC<Props> = ({result, onRetake}) => {
   const navigation = useNavigation();
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
@@ -199,35 +210,45 @@ const PersonalityTestResultScreen: React.FC<Props> = ({ result, onRetake }) => {
         </Header>
 
         <CharacterSection>
-          <View style={{ position: 'relative', width: 250, height: 250 }}>
+          <View style={{position: 'relative', width: 250, height: 250}}>
             {imageLoading && !imageError && (
-              <View style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: '#f0f0f0',
-                borderRadius: 20,
-              }}>
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: '#f0f0f0',
+                  borderRadius: 20,
+                }}>
                 <ActivityIndicator size="large" color="#ef4444" />
               </View>
             )}
             {!imageError && result.character.imageUrl ? (
-              <CharacterImage 
-                source={{ 
+              <CharacterImage
+                source={{
                   uri: result.character.imageUrl.replace('http://', 'https://'),
-                  cache: 'reload'
+                  cache: 'reload',
                 }}
                 resizeMode="contain"
                 onLoadStart={() => setImageLoading(true)}
                 onLoadEnd={() => setImageLoading(false)}
-                onError={(e) => {
-                  console.log('[PersonalityTestResult] Image load error:', e.nativeEvent.error);
-                  console.log('[PersonalityTestResult] Failed URL:', result.character.imageUrl);
-                  console.log('[PersonalityTestResult] Tried URL:', result.character.imageUrl.replace('http://', 'https://'));
+                onError={e => {
+                  console.log(
+                    '[PersonalityTestResult] Image load error:',
+                    e.nativeEvent.error,
+                  );
+                  console.log(
+                    '[PersonalityTestResult] Failed URL:',
+                    result.character.imageUrl,
+                  );
+                  console.log(
+                    '[PersonalityTestResult] Tried URL:',
+                    result.character.imageUrl.replace('http://', 'https://'),
+                  );
                   setImageError(true);
                   setImageLoading(false);
                 }}
@@ -236,12 +257,12 @@ const PersonalityTestResultScreen: React.FC<Props> = ({ result, onRetake }) => {
               <CharacterImage source={require('../assets/placeholder.png')} />
             )}
           </View>
-          
+
           <CharacterName>{result.character.nameKo}</CharacterName>
-          
+
           <MatchPercentage>{result.matchPercentage}%</MatchPercentage>
           <MatchText>일치율</MatchText>
-          
+
           <CharacterDescription>
             {result.character.description}
           </CharacterDescription>

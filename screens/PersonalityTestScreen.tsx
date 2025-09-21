@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import styled from 'styled-components/native';
-import { ImageBackground, Alert, ActivityIndicator, Image } from 'react-native';
+import {ImageBackground, Alert, ActivityIndicator, Image} from 'react-native';
 import ApiService from '../utils/api';
 import AsyncStorage from '../utils/storage';
-import { PersonalityTestResult } from '../utils/personalityTestData';
+import {PersonalityTestResult} from '../utils/personalityTestData';
 import PersonalityTestResultScreen from './PersonalityTestResultScreen';
 
 interface Question {
@@ -21,13 +21,15 @@ type PersonalityTestScreenProps = {
   onComplete: (result: PersonalityTestResult) => void;
 };
 
-const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
+const PersonalityTestScreen = ({onComplete}: PersonalityTestScreenProps) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<'A' | 'B' | null>(null);
   const [loading, setLoading] = useState(true);
-  const [testResult, setTestResult] = useState<PersonalityTestResult | null>(null);
+  const [testResult, setTestResult] = useState<PersonalityTestResult | null>(
+    null,
+  );
   const [showResult, setShowResult] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const processingRef = useRef(false);
@@ -40,7 +42,10 @@ const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
     try {
       const response = await ApiService.get('/personality-test/questions');
       console.log('[PersonalityTest] Loaded questions:', response.length);
-      console.log('[PersonalityTest] Questions:', response.map(q => q.id));
+      console.log(
+        '[PersonalityTest] Questions:',
+        response.map(q => q.id),
+      );
       setQuestions(response);
       setLoading(false);
     } catch (error: any) {
@@ -64,13 +69,17 @@ const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
 
     // 중복 클릭 방지 (state로도 체크)
     if (isProcessing) {
-      console.log('[PersonalityTest] Already processing (state), ignoring click');
+      console.log(
+        '[PersonalityTest] Already processing (state), ignoring click',
+      );
       return;
     }
 
     // 답변 개수 초과 방지
     if (answers.length >= 10) {
-      console.error('[PersonalityTest] Already have 10 answers, preventing additional submission');
+      console.error(
+        '[PersonalityTest] Already have 10 answers, preventing additional submission',
+      );
       return;
     }
 
@@ -88,7 +97,10 @@ const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
       if (currentQuestionIndex < questions.length - 1) {
         // 다음 질문으로
         const newAnswers = [...answers, selectedOption];
-        console.log('[PersonalityTest] Moving to next question, new answers:', newAnswers);
+        console.log(
+          '[PersonalityTest] Moving to next question, new answers:',
+          newAnswers,
+        );
         setAnswers(newAnswers);
         setCurrentQuestionIndex(currentQuestionIndex + 1);
         setSelectedOption(null);
@@ -100,16 +112,25 @@ const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
         console.log('[PersonalityTest] Final question reached');
         console.log('[PersonalityTest] Final answers:', finalAnswers);
         console.log('[PersonalityTest] Total answers:', finalAnswers.length);
-        
+
         if (finalAnswers.length !== 10) {
-          console.error('[PersonalityTest] Invalid answer count:', finalAnswers.length);
-          console.error('[PersonalityTest] Expected 10, got', finalAnswers.length);
-          Alert.alert('오류', `답변 개수가 올바르지 않습니다. (${finalAnswers.length}개)`);
+          console.error(
+            '[PersonalityTest] Invalid answer count:',
+            finalAnswers.length,
+          );
+          console.error(
+            '[PersonalityTest] Expected 10, got',
+            finalAnswers.length,
+          );
+          Alert.alert(
+            '오류',
+            `답변 개수가 올바르지 않습니다. (${finalAnswers.length}개)`,
+          );
           setIsProcessing(false);
           processingRef.current = false;
           return;
         }
-        
+
         // 결과 제출 (isProcessing은 submitAnswers에서 해제)
         submitAnswers(finalAnswers);
       }
@@ -124,22 +145,28 @@ const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
     setLoading(true);
     try {
       const result = await ApiService.post('/personality-test/result', {
-        answers: finalAnswers
+        answers: finalAnswers,
       });
-      
+
       console.log('[PersonalityTest] Result from backend:', result);
-      console.log('[PersonalityTest] Character imageUrl:', result.character?.imageUrl);
-      
+      console.log(
+        '[PersonalityTest] Character imageUrl:',
+        result.character?.imageUrl,
+      );
+
       // Save result to AsyncStorage
-      await AsyncStorage.setItem('personalityTestResult', JSON.stringify(result));
+      await AsyncStorage.setItem(
+        'personalityTestResult',
+        JSON.stringify(result),
+      );
       await AsyncStorage.setItem('hasCompletedPersonalityTest', 'true');
-      
+
       setTestResult(result);
       setShowResult(true);
       setLoading(false);
       setIsProcessing(false);
       processingRef.current = false;
-      
+
       // Call onComplete after showing result
       onComplete(result);
     } catch (error: any) {
@@ -169,54 +196,58 @@ const PersonalityTestScreen = ({ onComplete }: PersonalityTestScreenProps) => {
 
   // Show result screen if test is completed
   if (showResult && testResult) {
-    return <PersonalityTestResultScreen result={testResult} onRetake={handleRetakeTest} />;
+    return (
+      <PersonalityTestResultScreen
+        result={testResult}
+        onRetake={handleRetakeTest}
+      />
+    );
   }
 
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <BackgroundImage source={require('../assets/background.png')} resizeMode="cover">
+    <BackgroundImage
+      source={require('../assets/background.png')}
+      resizeMode="cover">
       <Container>
         <ProgressText>{currentQuestionIndex + 1}/10</ProgressText>
-        
+
         <QuestionContainer>
           <QuestionText>{currentQuestion.question}</QuestionText>
-          
+
           <OptionsContainer>
-            <OptionButton 
+            <OptionButton
               selected={selectedOption === 'A'}
               isO={true}
-              onPress={() => setSelectedOption('A')}
-            >
+              onPress={() => setSelectedOption('A')}>
               <OptionCircle selected={selectedOption === 'A'} isO={true}>
                 <OptionCircleText>O</OptionCircleText>
               </OptionCircle>
               <OptionText>{currentQuestion.optionA}</OptionText>
             </OptionButton>
-            
-            <OptionButton 
+
+            <OptionButton
               selected={selectedOption === 'B'}
               isO={false}
-              onPress={() => setSelectedOption('B')}
-            >
+              onPress={() => setSelectedOption('B')}>
               <OptionCircle selected={selectedOption === 'B'} isO={false}>
                 <OptionCircleText>X</OptionCircleText>
               </OptionCircle>
               <OptionText>{currentQuestion.optionB}</OptionText>
             </OptionButton>
           </OptionsContainer>
-          
+
           <HelpContainer>
             <LightIcon source={require('../assets/light.png')} />
             <HelpText>가장 유사한 답변을 골라주세요.</HelpText>
           </HelpContainer>
         </QuestionContainer>
-        
-        <NextButton 
+
+        <NextButton
           onPress={handleNext}
           disabled={!selectedOption || isProcessing}
-          active={!!selectedOption && !isProcessing}
-        >
+          active={!!selectedOption && !isProcessing}>
           <NextButtonText>다음으로</NextButtonText>
         </NextButton>
       </Container>
@@ -243,7 +274,7 @@ const LoadingContainer = styled.View`
 const ProgressText = styled.Text`
   font-size: 22px;
   font-weight: 600;
-  color: #F63F4E;
+  color: #f63f4e;
   text-align: center;
   margin-top: 50px;
 `;
@@ -266,22 +297,25 @@ const OptionsContainer = styled.View`
   width: 100%;
 `;
 
-const OptionButton = styled.TouchableOpacity<{ selected: boolean; isO: boolean }>`
+const OptionButton = styled.TouchableOpacity<{selected: boolean; isO: boolean}>`
   flex-direction: row;
   align-items: center;
   padding: 20px;
   margin-bottom: 16px;
-  background-color: ${props => props.selected ? (props.isO ? '#E6F4FF' : '#FFF0F1') : 'white'};
+  background-color: ${props =>
+    props.selected ? (props.isO ? '#E6F4FF' : '#FFF0F1') : 'white'};
   border-radius: 12px;
   border-width: 1px;
-  border-color: ${props => props.selected ? (props.isO ? '#3DC5FF' : '#F63F4E') : '#E5E5E5'};
+  border-color: ${props =>
+    props.selected ? (props.isO ? '#3DC5FF' : '#F63F4E') : '#E5E5E5'};
 `;
 
-const OptionCircle = styled.View<{ selected: boolean; isO: boolean }>`
+const OptionCircle = styled.View<{selected: boolean; isO: boolean}>`
   width: 48px;
   height: 48px;
   border-radius: 24px;
-  background-color: ${props => props.selected ? (props.isO ? '#3DC5FF' : '#F63F4E') : '#E5E5E5'};
+  background-color: ${props =>
+    props.selected ? (props.isO ? '#3DC5FF' : '#F63F4E') : '#E5E5E5'};
   justify-content: center;
   align-items: center;
   margin-right: 16px;
@@ -299,10 +333,10 @@ const OptionText = styled.Text`
   color: #333;
 `;
 
-const NextButton = styled.TouchableOpacity<{ active: boolean }>`
+const NextButton = styled.TouchableOpacity<{active: boolean}>`
   width: 100%;
   padding: 16px;
-  background-color: ${props => props.active ? '#F63F4E' : '#A8A8A8'};
+  background-color: ${props => (props.active ? '#F63F4E' : '#A8A8A8')};
   border-radius: 8px;
   align-items: center;
   margin-bottom: 40px;

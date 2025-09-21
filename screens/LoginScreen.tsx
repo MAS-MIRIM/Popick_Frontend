@@ -12,7 +12,7 @@ const LoginScreen = ({onLoginSuccess, onSignUpPress}: LoginScreenProps) => {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const [idError, setIdError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
@@ -29,7 +29,7 @@ const LoginScreen = ({onLoginSuccess, onSignUpPress}: LoginScreenProps) => {
       setPasswordError('비밀번호를 입력해주세요.');
       return;
     }
-    
+
     try {
       const response = await ApiService.login(userId, password);
       onLoginSuccess();
@@ -55,10 +55,10 @@ const LoginScreen = ({onLoginSuccess, onSignUpPress}: LoginScreenProps) => {
   return (
     <Container>
       <Spacer />
-      
+
       <ContentContainer>
         <StepTitle>POP!CK에서 사용했던{'\n'}정보를 입력해주세요.</StepTitle>
-        
+
         <InputContainer>
           <InputWrapper hasError={!!idError}>
             <StyledInput
@@ -99,14 +99,13 @@ const LoginScreen = ({onLoginSuccess, onSignUpPress}: LoginScreenProps) => {
       </ContentContainer>
 
       <ButtonContainer>
-        <NextButton 
+        <NextButton
           isActive={isFormValid()}
           onPress={handleLogin}
-          disabled={!isFormValid()}
-        >
+          disabled={!isFormValid()}>
           <NextButtonText>로그인</NextButtonText>
         </NextButton>
-        
+
         <SignUpContainer>
           <SignUpText>아직 계정이 없으신가요? </SignUpText>
           <SignUpLink onPress={onSignUpPress}>
@@ -122,7 +121,6 @@ const Container = styled.View`
   flex: 1;
   background-color: white;
 `;
-
 
 const Spacer = styled.View`
   height: 15%;
@@ -217,7 +215,7 @@ const SignUpLink = styled.TouchableOpacity``;
 
 const SignUpLinkText = styled.Text`
   font-size: 14px;
-  color: #F63F4E;
+  color: #f63f4e;
   font-weight: 600;
   text-decoration-line: underline;
 `;

@@ -1,15 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
-import { SafeAreaView, StatusBar, ScrollView, ActivityIndicator, Linking, View } from 'react-native';
-import ApiService, { User } from '../utils/api';
+import {
+  SafeAreaView,
+  StatusBar,
+  ScrollView,
+  ActivityIndicator,
+  Linking,
+  View,
+} from 'react-native';
+import ApiService, {User} from '../utils/api';
 import AsyncStorage from '../utils/storage';
-import { FavoriteManager } from '../utils/favoriteManager';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import CharacterAPI, { Character } from '../utils/characterApi';
+import {FavoriteManager} from '../utils/favoriteManager';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import CharacterAPI, {Character} from '../utils/characterApi';
 
 const Container = styled.View`
   flex: 1;
-  background-color: #F1F1F1;
+  background-color: #f1f1f1;
 `;
 
 const Header = styled.View`
@@ -30,7 +37,7 @@ const HeaderSpacer = styled.View`
 
 const ProfileSection = styled.View`
   padding: 20px 36px 24px 36px;
-  background-color: #F1F1F1;
+  background-color: #f1f1f1;
 `;
 
 const ContentSection = styled.View`
@@ -126,14 +133,14 @@ const StatButton = styled.TouchableOpacity`
   flex: 1;
   padding: 12px 0;
   border-width: 2px;
-  border-color: ${props => props.active ? '#ef4444' : '#e5e7eb'};
+  border-color: ${props => (props.active ? '#ef4444' : '#e5e7eb')};
   border-radius: 999px;
-  background-color: ${props => props.active ? 'white' : '#f3f4f6'};
+  background-color: ${props => (props.active ? 'white' : '#f3f4f6')};
 `;
 
 const StatText = styled.Text`
   text-align: center;
-  color: ${props => props.active ? '#ef4444' : '#6b7280'};
+  color: ${props => (props.active ? '#ef4444' : '#6b7280')};
   font-weight: 600;
 `;
 
@@ -157,7 +164,6 @@ const ItemCard = styled.View`
   elevation: 2;
   flex-direction: row;
 `;
-
 
 const ItemIcon = styled.Image`
   width: 148px;
@@ -253,7 +259,9 @@ const AddItemText = styled.Text`
 `;
 
 const ProfileScreen = () => {
-  const [activeTab, setActiveTab] = useState<'favorites' | 'owned'>('favorites');
+  const [activeTab, setActiveTab] = useState<'favorites' | 'owned'>(
+    'favorites',
+  );
   const [user, setUser] = useState<User | null>(null);
   const [testResult, setTestResult] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -273,7 +281,7 @@ const ProfileScreen = () => {
       loadFavorites();
       loadOwnedCharacters();
       loadCharacters(); // 캐릭터 데이터도 다시 로드
-    }, [])
+    }, []),
   );
 
   const loadFavorites = async () => {
@@ -286,7 +294,7 @@ const ProfileScreen = () => {
       // ALL 캐릭터 데이터 로드 (홈화면과 동일한 방식)
       const response = await fetch(`http://api.hjun.kr/hackathon/characters/`);
       const data = await response.json();
-      
+
       if (data.images && Array.isArray(data.images)) {
         const allProducts = data.images.map((item: any, index: number) => ({
           id: `${item.category}_${item.id || index}`,
@@ -295,11 +303,13 @@ const ProfileScreen = () => {
           series: item.parsedInfo?.series || '',
           seriesKo: item.parsedInfo?.koSeries || '',
           description: item.characterInfo?.description || '',
-          imageUrl: item.url.startsWith('http') ? item.url : `https://${item.url}`,
+          imageUrl: item.url.startsWith('http')
+            ? item.url
+            : `https://${item.url}`,
           popmartUrl: '#',
-          category: item.category
+          category: item.category,
         }));
-        
+
         setCharacters(allProducts);
         console.log('[MyPage] Loaded characters:', allProducts.length);
       }
@@ -325,7 +335,7 @@ const ProfileScreen = () => {
       // 유저 프로필 가져오기
       const profileResponse = await ApiService.getProfile();
       setUser(profileResponse.user);
-      
+
       // 테스트 결과 가져오기 (AsyncStorage에서)
       const savedResult = await AsyncStorage.getItem('personalityTestResult');
       console.log('[MyPage] Saved result:', savedResult);
@@ -344,14 +354,20 @@ const ProfileScreen = () => {
 
   if (loading) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#F1F1F1', justifyContent: 'center', alignItems: 'center' }}>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: '#F1F1F1',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
         <ActivityIndicator size="large" color="#ef4444" />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F1F1F1' }}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#F1F1F1'}}>
       <Container>
         <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
         <Header>
@@ -359,100 +375,119 @@ const ProfileScreen = () => {
           <HeaderSpacer />
         </Header>
 
-      <ProfileSection>
-        <ProfileInfo>
-          <ProfileImageContainer>
-            <ProfileImage>
-              <ProfileIcon>
-                <ProfileHead />
-                <ProfileBody />
-              </ProfileIcon>
-            </ProfileImage>
-          </ProfileImageContainer>
-          
-          <ProfileDetails>
-            <UserNickname>{user?.nickname || '사용자'}</UserNickname>
-            <TestResultCharacter>
-              {testResult ? `${testResult}` : '테스트를 진행해주세요'}
-            </TestResultCharacter>
-          </ProfileDetails>
-        </ProfileInfo>
+        <ProfileSection>
+          <ProfileInfo>
+            <ProfileImageContainer>
+              <ProfileImage>
+                <ProfileIcon>
+                  <ProfileHead />
+                  <ProfileBody />
+                </ProfileIcon>
+              </ProfileImage>
+            </ProfileImageContainer>
 
-        <StatsContainer>
-          <StatButton 
-            active={activeTab === 'favorites'} 
-            onPress={() => setActiveTab('favorites')}
-          >
-            <StatText active={activeTab === 'favorites'}>찜 {favoriteToyIds.length}</StatText>
-          </StatButton>
-          <View style={{ width: 10 }} />
-          <StatButton 
-            active={activeTab === 'owned'}
-            onPress={() => setActiveTab('owned')}
-          >
-            <StatText active={activeTab === 'owned'}>소유 캐릭터 {ownedToyIds.length}</StatText>
-          </StatButton>
-        </StatsContainer>
-      </ProfileSection>
+            <ProfileDetails>
+              <UserNickname>{user?.nickname || '사용자'}</UserNickname>
+              <TestResultCharacter>
+                {testResult ? `${testResult}` : '테스트를 진행해주세요'}
+              </TestResultCharacter>
+            </ProfileDetails>
+          </ProfileInfo>
 
-      <ContentSection>
-        <SectionTitle>{activeTab === 'favorites' ? '찜 목록' : '소유 캐릭터'}</SectionTitle>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
-          {activeTab === 'favorites' ? (
-            <>
-              {favoriteToyIds.length === 0 ? (
-                <ItemCard style={{ opacity: 0.5 }}>
-                  <ItemContent>
-                    <ItemTitle style={{ textAlign: 'center' }}>찜한 캐릭터가 없습니다</ItemTitle>
-                    <ItemDescription style={{ textAlign: 'center' }}>홈 화면에서 하트를 눌러 찜해보세요!</ItemDescription>
-                  </ItemContent>
-                </ItemCard>
-              ) : (
-                favoriteToyIds.map(toyId => {
+          <StatsContainer>
+            <StatButton
+              active={activeTab === 'favorites'}
+              onPress={() => setActiveTab('favorites')}>
+              <StatText active={activeTab === 'favorites'}>
+                찜 {favoriteToyIds.length}
+              </StatText>
+            </StatButton>
+            <View style={{width: 10}} />
+            <StatButton
+              active={activeTab === 'owned'}
+              onPress={() => setActiveTab('owned')}>
+              <StatText active={activeTab === 'owned'}>
+                소유 캐릭터 {ownedToyIds.length}
+              </StatText>
+            </StatButton>
+          </StatsContainer>
+        </ProfileSection>
+
+        <ContentSection>
+          <SectionTitle>
+            {activeTab === 'favorites' ? '찜 목록' : '소유 캐릭터'}
+          </SectionTitle>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{paddingBottom: 20}}>
+            {activeTab === 'favorites' ? (
+              <>
+                {favoriteToyIds.length === 0 ? (
+                  <ItemCard style={{opacity: 0.5}}>
+                    <ItemContent>
+                      <ItemTitle style={{textAlign: 'center'}}>
+                        찜한 캐릭터가 없습니다
+                      </ItemTitle>
+                      <ItemDescription style={{textAlign: 'center'}}>
+                        홈 화면에서 하트를 눌러 찜해보세요!
+                      </ItemDescription>
+                    </ItemContent>
+                  </ItemCard>
+                ) : (
+                  favoriteToyIds.map(toyId => {
+                    const toy = characters.find(t => t.id === toyId);
+                    if (!toy) return null;
+                    return (
+                      <ItemCard key={toy.id}>
+                        <ItemIcon source={{uri: toy.imageUrl}} />
+                        <ItemContent>
+                          <ItemTitle>{toy.nameKo}</ItemTitle>
+                          <ItemDescription>{toy.seriesKo}</ItemDescription>
+                          <ItemDescription>{toy.description}</ItemDescription>
+                          <ItemFooter>
+                            <ActionButton
+                              onPress={async () => {
+                                await FavoriteManager.removeFavorite(toy.id);
+                                await loadFavorites();
+                              }}>
+                              <ActionIcon
+                                source={require('../assets/heart1.png')}
+                              />
+                            </ActionButton>
+                            <ActionButton
+                              onPress={() => Linking.openURL(toy.popmartUrl)}>
+                              <LinkIcon
+                                source={require('../assets/link.png')}
+                              />
+                            </ActionButton>
+                          </ItemFooter>
+                        </ItemContent>
+                      </ItemCard>
+                    );
+                  })
+                )}
+              </>
+            ) : (
+              <OwnedGrid>
+                {ownedToyIds.map(toyId => {
                   const toy = characters.find(t => t.id === toyId);
                   if (!toy) return null;
                   return (
-                    <ItemCard key={toy.id}>
-                      <ItemIcon source={{ uri: toy.imageUrl }} />
-                      <ItemContent>
-                        <ItemTitle>{toy.nameKo}</ItemTitle>
-                        <ItemDescription>{toy.seriesKo}</ItemDescription>
-                        <ItemDescription>{toy.description}</ItemDescription>
-                        <ItemFooter>
-                          <ActionButton onPress={async () => {
-                            await FavoriteManager.removeFavorite(toy.id);
-                            await loadFavorites();
-                          }}>
-                            <ActionIcon source={require('../assets/heart1.png')} />
-                          </ActionButton>
-                          <ActionButton onPress={() => Linking.openURL(toy.popmartUrl)}>
-                            <LinkIcon source={require('../assets/link.png')} />
-                          </ActionButton>
-                        </ItemFooter>
-                      </ItemContent>
-                    </ItemCard>
+                    <OwnedItem
+                      key={toy.id}
+                      onPress={() => Linking.openURL(toy.popmartUrl)}>
+                      <OwnedItemImage source={{uri: toy.imageUrl}} />
+                    </OwnedItem>
                   );
-                })
-              )}
-            </>
-          ) : (
-            <OwnedGrid>
-              {ownedToyIds.map(toyId => {
-                const toy = characters.find(t => t.id === toyId);
-                if (!toy) return null;
-                return (
-                  <OwnedItem key={toy.id} onPress={() => Linking.openURL(toy.popmartUrl)}>
-                    <OwnedItemImage source={{ uri: toy.imageUrl }} />
-                  </OwnedItem>
-                );
-              })}
-              <AddItemButton onPress={() => navigation.navigate('HomeTab' as never)}>
-                <AddItemText>+</AddItemText>
-              </AddItemButton>
-            </OwnedGrid>
-          )}
-        </ScrollView>
-      </ContentSection>
+                })}
+                <AddItemButton
+                  onPress={() => navigation.navigate('HomeTab' as never)}>
+                  <AddItemText>+</AddItemText>
+                </AddItemButton>
+              </OwnedGrid>
+            )}
+          </ScrollView>
+        </ContentSection>
       </Container>
     </SafeAreaView>
   );

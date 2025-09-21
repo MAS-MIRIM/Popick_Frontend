@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   ScrollView,
   SafeAreaView,
@@ -15,9 +15,9 @@ import {
   Alert,
 } from 'react-native';
 import styled from 'styled-components/native';
-import { useNavigation } from '@react-navigation/native';
-import { FavoriteManager } from '../utils/favoriteManager';
-import CharacterAPI, { Character } from '../utils/characterApi';
+import {useNavigation} from '@react-navigation/native';
+import {FavoriteManager} from '../utils/favoriteManager';
+import CharacterAPI, {Character} from '../utils/characterApi';
 import AsyncStorage from '../utils/storage';
 
 const Container = styled(SafeAreaView)`
@@ -65,7 +65,7 @@ const Dot = styled.View`
   width: 8px;
   height: 8px;
   border-radius: 4px;
-  background-color: ${props => props.active ? '#ff4757' : '#dfe6e9'};
+  background-color: ${props => (props.active ? '#ff4757' : '#dfe6e9')};
   margin: 0 4px;
 `;
 
@@ -138,13 +138,13 @@ const TabContainer = styled.ScrollView`
 const Tab = styled(TouchableOpacity)`
   padding: 10px 20px;
   margin-right: 10px;
-  background-color: ${props => props.active ? '#2d3436' : '#f0f0f0'};
+  background-color: ${props => (props.active ? '#2d3436' : '#f0f0f0')};
   border-radius: 20px;
 `;
 
 const TabText = styled.Text`
-  color: ${props => props.active ? '#fff' : '#636e72'};
-  font-weight: ${props => props.active ? 'bold' : 'normal'};
+  color: ${props => (props.active ? '#fff' : '#636e72')};
+  font-weight: ${props => (props.active ? 'bold' : 'normal')};
 `;
 
 const ProductGrid = styled.View`
@@ -186,7 +186,7 @@ const LikeCount = styled.Text`
   margin-left: 5px;
 `;
 
-const { width: screenWidth } = Dimensions.get('window');
+const {width: screenWidth} = Dimensions.get('window');
 
 const CharacterShoppingApp = () => {
   const [activeTab, setActiveTab] = useState('ALL');
@@ -212,11 +212,11 @@ const CharacterShoppingApp = () => {
   const loadCharacters = async () => {
     try {
       setLoading(true);
-      
+
       // ALL 탭일 때는 /characters/ API로 모든 상품 로드
       const response = await fetch(`http://api.hjun.kr/hackathon/characters/`);
       const data = await response.json();
-      
+
       if (data.images && Array.isArray(data.images)) {
         // API 응답에서 모든 상품 데이터를 Character 형식으로 변환
         const allProducts = data.images.map((item: any, index: number) => ({
@@ -226,21 +226,25 @@ const CharacterShoppingApp = () => {
           series: item.parsedInfo?.series || '',
           seriesKo: item.parsedInfo?.koSeries || '',
           description: item.characterInfo?.description || '',
-          imageUrl: item.url.startsWith('http') ? item.url : `https://${item.url}`,
+          imageUrl: item.url.startsWith('http')
+            ? item.url
+            : `https://${item.url}`,
           popmartUrl: '#',
-          category: item.category
+          category: item.category,
         }));
-        
+
         setCharacters(allProducts);
-        
+
         // Initialize like counts
         const counts: {[key: string]: number} = {};
         allProducts.forEach((char: any) => {
           counts[char.id] = Math.floor(Math.random() * 20 + 5);
         });
         setLikeCounts(counts);
-        
-        console.log(`[HomeScreen] Loaded ${allProducts.length} products from ALL API`);
+
+        console.log(
+          `[HomeScreen] Loaded ${allProducts.length} products from ALL API`,
+        );
       }
     } catch (error) {
       console.error('[HomeScreen] Error loading all characters:', error);
@@ -258,10 +262,10 @@ const CharacterShoppingApp = () => {
   const handleToggleFavorite = async (itemId: string) => {
     const isFavorite = await FavoriteManager.toggleFavorite(itemId);
     await loadFavorites();
-    
+
     setLikeCounts(prev => ({
       ...prev,
-      [itemId]: isFavorite ? prev[itemId] + 1 : prev[itemId] - 1
+      [itemId]: isFavorite ? prev[itemId] + 1 : prev[itemId] - 1,
     }));
   };
 
@@ -270,25 +274,40 @@ const CharacterShoppingApp = () => {
       // Get current owned characters
       const stored = await AsyncStorage.getItem('ownedCharacters');
       let ownedCharacters = stored ? JSON.parse(stored) : [];
-      
+
       // Add character if not already owned
       if (!ownedCharacters.includes(character.id)) {
         ownedCharacters.push(character.id);
-        await AsyncStorage.setItem('ownedCharacters', JSON.stringify(ownedCharacters));
+        await AsyncStorage.setItem(
+          'ownedCharacters',
+          JSON.stringify(ownedCharacters),
+        );
         console.log('[HomeScreen] Added character to owned:', character.nameKo);
-        
+
         // Also add to dogam
         const dogamStored = await AsyncStorage.getItem('dogamCharacters');
         let dogamCharacters = dogamStored ? JSON.parse(dogamStored) : [];
         if (!dogamCharacters.includes(character.id)) {
           dogamCharacters.push(character.id);
-          await AsyncStorage.setItem('dogamCharacters', JSON.stringify(dogamCharacters));
-          console.log('[HomeScreen] Added character to dogam:', character.nameKo);
+          await AsyncStorage.setItem(
+            'dogamCharacters',
+            JSON.stringify(dogamCharacters),
+          );
+          console.log(
+            '[HomeScreen] Added character to dogam:',
+            character.nameKo,
+          );
         }
-        
-        Alert.alert('소유 캐릭터 추가', `${character.nameKo}를 소유 캐릭터에 추가했습니다!`);
+
+        Alert.alert(
+          '소유 캐릭터 추가',
+          `${character.nameKo}를 소유 캐릭터에 추가했습니다!`,
+        );
       } else {
-        Alert.alert('이미 소유한 캐릭터', `${character.nameKo}는 이미 소유한 캐릭터입니다.`);
+        Alert.alert(
+          '이미 소유한 캐릭터',
+          `${character.nameKo}는 이미 소유한 캐릭터입니다.`,
+        );
       }
     } catch (error) {
       console.error('[HomeScreen] Error adding owned character:', error);
@@ -303,102 +322,117 @@ const CharacterShoppingApp = () => {
   };
 
   const trendingItems = [
-    { 
-      id: 1, 
-      rank: '1', 
-      name: 'Pop Mart Labubu The...', 
-      image: require('../assets/no1.png'), 
-      url: 'https://www.popmart.co.kr/product/the-monsters-%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95-%ED%82%A4%EB%A7%81/1920/category/87/display/1/' 
+    {
+      id: 1,
+      rank: '1',
+      name: 'Pop Mart Labubu The...',
+      image: require('../assets/no1.png'),
+      url: 'https://www.popmart.co.kr/product/the-monsters-%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95-%ED%82%A4%EB%A7%81/1920/category/87/display/1/',
     },
-    { 
-      id: 2, 
-      rank: '2', 
-      name: 'Pop Mart Labubu The...', 
-      image: require('../assets/no2.png'), 
-      url: 'https://www.popmart.co.kr/product/the-monsters-%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95-%ED%82%A4%EB%A7%81/1920/category/87/display/1/' 
+    {
+      id: 2,
+      rank: '2',
+      name: 'Pop Mart Labubu The...',
+      image: require('../assets/no2.png'),
+      url: 'https://www.popmart.co.kr/product/the-monsters-%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95-%ED%82%A4%EB%A7%81/1920/category/87/display/1/',
     },
-    { 
-      id: 3, 
-      rank: '3', 
-      name: 'Pop Mart Labubu The...', 
-      image: require('../assets/no3.png'), 
-      url: 'https://www.popmart.co.kr/product/the-monsters-%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95-%ED%82%A4%EB%A7%81/1920/category/87/display/1/' 
+    {
+      id: 3,
+      rank: '3',
+      name: 'Pop Mart Labubu The...',
+      image: require('../assets/no3.png'),
+      url: 'https://www.popmart.co.kr/product/the-monsters-%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95-%ED%82%A4%EB%A7%81/1920/category/87/display/1/',
     },
-    { 
-      id: 4, 
-      rank: '4', 
-      name: 'Pop Mart Labubu The...', 
-      image: require('../assets/no4.png'), 
-      url: 'https://www.popmart.co.kr/product/the-monsters-%EC%88%98%EC%83%81%ED%95%9C-%ED%8E%B8%EC%9D%98%EC%A0%90-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B4%EC%96%B4%ED%8F%B0-%EB%B0%B1/1981/category/87/display/1/' 
+    {
+      id: 4,
+      rank: '4',
+      name: 'Pop Mart Labubu The...',
+      image: require('../assets/no4.png'),
+      url: 'https://www.popmart.co.kr/product/the-monsters-%EC%88%98%EC%83%81%ED%95%9C-%ED%8E%B8%EC%9D%98%EC%A0%90-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B4%EC%96%B4%ED%8F%B0-%EB%B0%B1/1981/category/87/display/1/',
     },
-    { 
-      id: 5, 
-      rank: '5', 
-      name: 'Pop Mart Labubu The...', 
-      image: require('../assets/no5.png'), 
-      url: 'https://www.popmart.co.kr/product/%ED%81%AC%EB%9D%BC%EC%9D%B4%EB%B2%A0%EC%9D%B4%EB%B9%84-%EC%82%AC%EB%9E%91%EC%9D%98-%EB%88%88%EB%AC%BC-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95/1803/category/206/display/1/' 
+    {
+      id: 5,
+      rank: '5',
+      name: 'Pop Mart Labubu The...',
+      image: require('../assets/no5.png'),
+      url: 'https://www.popmart.co.kr/product/%ED%81%AC%EB%9D%BC%EC%9D%B4%EB%B2%A0%EC%9D%B4%EB%B9%84-%EC%82%AC%EB%9E%91%EC%9D%98-%EB%88%88%EB%AC%BC-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95/1803/category/206/display/1/',
     },
-    { 
-      id: 6, 
-      rank: '6', 
-      name: 'Pop Mart Labubu The...', 
-      image: require('../assets/no6.png'), 
-      url: 'https://www.popmart.co.kr/product/the-monsters-%EC%B2%B4%ED%81%AC%EB%A9%94%EC%9D%B4%ED%8A%B8-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95-%ED%82%A4%EB%A7%81/1811/category/87/display/1/' 
+    {
+      id: 6,
+      rank: '6',
+      name: 'Pop Mart Labubu The...',
+      image: require('../assets/no6.png'),
+      url: 'https://www.popmart.co.kr/product/the-monsters-%EC%B2%B4%ED%81%AC%EB%A9%94%EC%9D%B4%ED%8A%B8-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95-%ED%82%A4%EB%A7%81/1811/category/87/display/1/',
     },
-    { 
-      id: 7, 
-      rank: '7', 
-      name: 'Pop Mart Labubu The...', 
-      image: require('../assets/no7.png'), 
-      url: 'https://www.popmart.co.kr/product/%EB%9D%BC%EB%B6%80%EB%B6%80-%EC%BD%94%EC%B9%B4%EC%BD%9C%EB%9D%BC-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95-%ED%82%A4%EB%A7%81/1772/category/87/display/1/' 
+    {
+      id: 7,
+      rank: '7',
+      name: 'Pop Mart Labubu The...',
+      image: require('../assets/no7.png'),
+      url: 'https://www.popmart.co.kr/product/%EB%9D%BC%EB%B6%80%EB%B6%80-%EC%BD%94%EC%B9%B4%EC%BD%9C%EB%9D%BC-%EC%8B%9C%EB%A6%AC%EC%A6%88-%EC%9D%B8%ED%98%95-%ED%82%A4%EB%A7%81/1772/category/87/display/1/',
     },
-    { 
-      id: 8, 
-      rank: '8', 
-      name: 'Pop Mart Labubu The...', 
-      image: require('../assets/no8.png'), 
-      url: 'https://www.popmart.com/labubu8' 
+    {
+      id: 8,
+      rank: '8',
+      name: 'Pop Mart Labubu The...',
+      image: require('../assets/no8.png'),
+      url: 'https://www.popmart.com/labubu8',
     },
-    { 
-      id: 9, 
-      rank: '9', 
-      name: 'Pop Mart Labubu The...', 
-      image: require('../assets/no9.png'), 
-      url: 'https://www.popmart.com/labubu9' 
+    {
+      id: 9,
+      rank: '9',
+      name: 'Pop Mart Labubu The...',
+      image: require('../assets/no9.png'),
+      url: 'https://www.popmart.com/labubu9',
     },
-    { 
-      id: 10, 
-      rank: '10', 
-      name: 'Pop Mart Labubu The...', 
-      image: require('../assets/no10.png'), 
-      url: 'https://www.popmart.com/labubu10' 
-    }
+    {
+      id: 10,
+      rank: '10',
+      name: 'Pop Mart Labubu The...',
+      image: require('../assets/no10.png'),
+      url: 'https://www.popmart.com/labubu10',
+    },
   ];
 
-  const tabs = ['ALL', 'DIMU', 'RABUBU', 'MOLLY', 'SKULLPANDA', 'KUBO', 'CRYBABY', 'HACHI', 'POOKY', 'PINOJELLY', 'JIGGER'];
+  const tabs = [
+    'ALL',
+    'DIMU',
+    'RABUBU',
+    'MOLLY',
+    'SKULLPANDA',
+    'KUBO',
+    'CRYBABY',
+    'HACHI',
+    'POOKY',
+    'PINOJELLY',
+    'JIGGER',
+  ];
 
   const loadTabProducts = async () => {
     if (activeTab === 'ALL') return;
-    
+
     try {
       setLoading(true);
       // 탭 이름에 따른 캐릭터 ID 매핑
       const tabMapping: {[key: string]: string} = {
-        'DIMU': 'char-dimu',
-        'RABUBU': 'char-rabubu',
-        'MOLLY': 'char-molly',
-        'SKULLPANDA': 'char-skullpanda',
-        'KUBO': 'char-kubo',
-        'CRYBABY': 'char-crybaby',
-        'HACHI': 'char-hachi',
-        'POOKY': 'char-pooky',
-        'PINOJELLY': 'char-pinojelly',
-        'JIGGER': 'char-jigger'
+        DIMU: 'char-dimu',
+        RABUBU: 'char-rabubu',
+        MOLLY: 'char-molly',
+        SKULLPANDA: 'char-skullpanda',
+        KUBO: 'char-kubo',
+        CRYBABY: 'char-crybaby',
+        HACHI: 'char-hachi',
+        POOKY: 'char-pooky',
+        PINOJELLY: 'char-pinojelly',
+        JIGGER: 'char-jigger',
       };
-      const categoryId = tabMapping[activeTab] || `char-${activeTab.toLowerCase()}`;
-      const response = await fetch(`http://api.hjun.kr/hackathon/characters/${categoryId}`);
+      const categoryId =
+        tabMapping[activeTab] || `char-${activeTab.toLowerCase()}`;
+      const response = await fetch(
+        `http://api.hjun.kr/hackathon/characters/${categoryId}`,
+      );
       const data = await response.json();
-      
+
       if (data.images && Array.isArray(data.images)) {
         // API 응답에서 상품 데이터를 Character 형식으로 변환
         const products = data.images.map((item: any) => ({
@@ -408,8 +442,10 @@ const CharacterShoppingApp = () => {
           series: item.parsedInfo?.series || '',
           seriesKo: item.parsedInfo?.koSeries || '',
           description: item.characterInfo?.description || '',
-          imageUrl: item.url.startsWith('http') ? item.url : `https://${item.url}`,
-          popmartUrl: '#'
+          imageUrl: item.url.startsWith('http')
+            ? item.url
+            : `https://${item.url}`,
+          popmartUrl: '#',
         }));
         setTabProducts(products);
       }
@@ -430,37 +466,41 @@ const CharacterShoppingApp = () => {
 
   const products = getFilteredProducts();
 
-  const renderProduct = ({ item, index }) => {
+  const renderProduct = ({item, index}) => {
     const isFavorited = favorites.includes(item.id);
-    
+
     return (
-      <ProductCard 
-        style={{ marginRight: index % 2 === 0 ? '2%' : 0 }}
-        onPress={() => handleCharacterPress(item)}
-      >
-        <View style={{ position: 'relative' }}>
-          <ProductImage source={{ uri: item.imageUrl }} />
+      <ProductCard
+        style={{marginRight: index % 2 === 0 ? '2%' : 0}}
+        onPress={() => handleCharacterPress(item)}>
+        <View style={{position: 'relative'}}>
+          <ProductImage source={{uri: item.imageUrl}} />
           <TouchableOpacity
-            style={{ 
-              position: 'absolute', 
-              top: 10, 
-              right: 10, 
-              flexDirection: 'row', 
-              alignItems: 'center', 
-              paddingHorizontal: 8, 
-              paddingVertical: 4, 
-              borderRadius: 14 
+            style={{
+              position: 'absolute',
+              top: 10,
+              right: 10,
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingHorizontal: 8,
+              paddingVertical: 4,
+              borderRadius: 14,
             }}
-            onPress={(e) => {
+            onPress={e => {
               e.stopPropagation();
               handleToggleFavorite(item.id);
-            }}
-          >
-            <Image 
-              source={isFavorited ? require('../assets/heart1.png') : require('../assets/heart2.png')} 
-              style={{ width: 16, height: 16 }}
+            }}>
+            <Image
+              source={
+                isFavorited
+                  ? require('../assets/heart1.png')
+                  : require('../assets/heart2.png')
+              }
+              style={{width: 16, height: 16}}
             />
-            <LikeCount style={{ color: '#8C8C8C', marginLeft: 2 }}>{likeCounts[item.id] || 0}k</LikeCount>
+            <LikeCount style={{color: '#8C8C8C', marginLeft: 2}}>
+              {likeCounts[item.id] || 0}k
+            </LikeCount>
           </TouchableOpacity>
         </View>
         <ProductInfo>
@@ -475,7 +515,7 @@ const CharacterShoppingApp = () => {
   return (
     <Container>
       <StatusBar barStyle="dark-content" />
-      
+
       <Header>
         <Logo source={require('../assets/logo.png')} />
         <NotificationIcon>
@@ -489,7 +529,7 @@ const CharacterShoppingApp = () => {
         keyExtractor={item => item.id.toString()}
         numColumns={2}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16 }}
+        contentContainerStyle={{paddingHorizontal: 16}}
         ListHeaderComponent={() => (
           <>
             <MainBanner>
@@ -498,45 +538,61 @@ const CharacterShoppingApp = () => {
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
                 data={[
-                  { id: '1', image: require('../assets/ad1.png'), title: '나와 잘 맞는\n캐릭터는?' },
-                  { id: '2', image: require('../assets/ad2.png'), title: '리사도 이제\n크라이베이비' }
+                  {
+                    id: '1',
+                    image: require('../assets/ad1.png'),
+                    title: '나와 잘 맞는\n캐릭터는?',
+                  },
+                  {
+                    id: '2',
+                    image: require('../assets/ad2.png'),
+                    title: '리사도 이제\n크라이베이비',
+                  },
                 ]}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                  <TouchableOpacity 
-                    style={{ width: screenWidth - 32, alignItems: 'center', justifyContent: 'center', padding: 10 }}
+                keyExtractor={item => item.id}
+                renderItem={({item}) => (
+                  <TouchableOpacity
+                    style={{
+                      width: screenWidth - 32,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: 10,
+                    }}
                     onPress={() => handleBannerPress(item.id)}
-                    activeOpacity={0.8}
-                  >
-                    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                      <Image 
-                        source={item.image} 
-                        style={{ width: 348, height: 306, borderRadius: 12 }} 
+                    activeOpacity={0.8}>
+                    <View
+                      style={{alignItems: 'center', justifyContent: 'center'}}>
+                      <Image
+                        source={item.image}
+                        style={{width: 348, height: 306, borderRadius: 12}}
                       />
-                      <Text style={{
-                        position: 'absolute',
-                        bottom: 30,
-                        left: 30,
-                      color: 'white',
-                      fontSize: 24,
-                      fontWeight: 'bold',
-                      textShadowColor: 'rgba(0, 0, 0, 0.5)',
-                      textShadowOffset: { width: 0, height: 2 },
-                      textShadowRadius: 4
-                    }}>
-                      {item.title}
-                    </Text>
+                      <Text
+                        style={{
+                          position: 'absolute',
+                          bottom: 30,
+                          left: 30,
+                          color: 'white',
+                          fontSize: 24,
+                          fontWeight: 'bold',
+                          textShadowColor: 'rgba(0, 0, 0, 0.5)',
+                          textShadowOffset: {width: 0, height: 2},
+                          textShadowRadius: 4,
+                        }}>
+                        {item.title}
+                      </Text>
                     </View>
                   </TouchableOpacity>
                 )}
-                onScroll={(event) => {
-                  const index = Math.round(event.nativeEvent.contentOffset.x / (screenWidth - 32));
+                onScroll={event => {
+                  const index = Math.round(
+                    event.nativeEvent.contentOffset.x / (screenWidth - 32),
+                  );
                   setCurrentBannerIndex(index);
                 }}
                 scrollEventThrottle={16}
               />
             </MainBanner>
-            
+
             <PageIndicator>
               <Dot active={currentBannerIndex === 0} />
               <Dot active={currentBannerIndex === 1} />
@@ -544,13 +600,31 @@ const CharacterShoppingApp = () => {
 
             <TrendingSection>
               <SectionTitle>지금 뜨는 캐릭터</SectionTitle>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
-                <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#F63F4E', marginRight: 6 }} />
-                <Text style={{ fontSize: 10, fontWeight: '500', color: '#636e72' }}>오늘 0시 기준</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginBottom: 15,
+                }}>
+                <View
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 3,
+                    backgroundColor: '#F63F4E',
+                    marginRight: 6,
+                  }}
+                />
+                <Text
+                  style={{fontSize: 10, fontWeight: '500', color: '#636e72'}}>
+                  오늘 0시 기준
+                </Text>
               </View>
               <TrendingList horizontal showsHorizontalScrollIndicator={false}>
-                {trendingItems.map((item) => (
-                  <TrendingItem key={item.id} onPress={() => Linking.openURL(item.url)}>
+                {trendingItems.map(item => (
+                  <TrendingItem
+                    key={item.id}
+                    onPress={() => Linking.openURL(item.url)}>
                     <View>
                       <TrendingImage source={item.image} />
                       <TrendingNumber>{item.rank}</TrendingNumber>
@@ -563,22 +637,23 @@ const CharacterShoppingApp = () => {
 
             <TabSection>
               <TabContainer horizontal showsHorizontalScrollIndicator={false}>
-                {tabs.map((tab) => (
-                  <Tab 
-                    key={tab} 
+                {tabs.map(tab => (
+                  <Tab
+                    key={tab}
                     active={activeTab === tab}
-                    onPress={() => setActiveTab(tab)}
-                  >
+                    onPress={() => setActiveTab(tab)}>
                     <TabText active={activeTab === tab}>{tab}</TabText>
                   </Tab>
                 ))}
               </TabContainer>
             </TabSection>
-            
+
             {loading && (
-              <View style={{ padding: 20, alignItems: 'center' }}>
+              <View style={{padding: 20, alignItems: 'center'}}>
                 <ActivityIndicator size="large" color="#ef4444" />
-                <Text style={{ marginTop: 10, color: '#636e72' }}>캐릭터 로딩 중...</Text>
+                <Text style={{marginTop: 10, color: '#636e72'}}>
+                  캐릭터 로딩 중...
+                </Text>
               </View>
             )}
           </>
